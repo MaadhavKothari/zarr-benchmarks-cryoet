@@ -1,0 +1,38 @@
+# Zarr-Benchmarks CryoET Extension Requirements
+# Python 3.13+ required
+
+# Core Zarr & Storage
+zarr==2.18.7
+numcodecs==0.15.1
+s3fs==0.4.2
+
+# Data Processing
+numpy==2.3.4
+pandas==2.3.3
+
+# Visualization
+matplotlib==3.10.7
+scikit-image==0.25.2
+
+# CryoET Data Portal
+cryoet_data_portal==4.5.0
+
+# Jupyter Notebooks
+jupyterlab==4.4.10
+notebook==7.4.1
+ipykernel==6.30.0
+ipywidgets==8.1.6
+
+# 3D Visualization (optional)
+# napari[all]>=0.5.0  # Uncomment for interactive 3D viewing
+vizarr==0.1.1
+
+# Development Tools (optional, for contributors)
+# pytest>=8.0.0
+# black>=24.0.0
+# ruff>=0.8.0
+# mypy>=1.11.0
+# pre-commit>=3.0.0
+
+# Base HEFTIE dependencies (already included via -e .)
+# Install with: pip install -e ".[plots,zarr-python-v3]"

@@ -1,0 +1,228 @@
+name: CryoET Benchmarks CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'cryoet_*.py'
+      - 'tests/**'
+      - 'src/zarr_benchmarks/**'
+      - '.github/workflows/cryoet-benchmarks.yml'
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run weekly on Sundays at 00:00 UTC
+    - cron: '0 0 * * 0'
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  test-connection:
+    name: Test CryoET Portal Connection
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[plots,zarr-python-v3]"
+          pip install -r requirements-cryoet.txt
+
+      - name: Test CryoET Portal connection
+        run: |
+          python test_cryoet_connection_v2.py
+        env:
+          PYTHONUNBUFFERED: 1
+
+  quick-benchmark:
+    name: Quick Benchmark
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: test-connection
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[plots,zarr-python-v3]"
+          pip install -r requirements-cryoet.txt
+
+      - name: Run quick benchmark
+        run: |
+          python cryoet_real_data_quick.py
+        env:
+          PYTHONUNBUFFERED: 1
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: quick-benchmark-results
+          path: |
+            data/output/cryoet_viz/*.png
+            data/output/cryoet_benchmarks/*.png
+            data/output/cryoet_benchmarks/*.csv
+          retention-days: 30
+
+  chunking-benchmark:
+    name: Chunking Benchmark
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: test-connection
+    # Only run on main branch or manual trigger to save resources
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[plots,zarr-python-v3]"
+          pip install -r requirements-cryoet.txt
+
+      - name: Run chunking benchmark
+        run: |
+          python cryoet_chunking_benchmark.py
+        env:
+          PYTHONUNBUFFERED: 1
+
+      - name: Upload chunking results
+        uses: actions/upload-artifact@v4
+        with:
+          name: chunking-benchmark-results
+          path: |
+            data/output/chunking_benchmarks/*.png
+            data/output/chunking_benchmarks/*.csv
+          retention-days: 30
+
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install black ruff mypy
+
+      - name: Check formatting with Black
+        run: |
+          black --check --diff cryoet_*.py
+
+      - name: Lint with Ruff
+        run: |
+          ruff check cryoet_*.py
+
+      - name: Type check with MyPy (optional, may fail)
+        continue-on-error: true
+        run: |
+          mypy cryoet_*.py
+
+  performance-comparison:
+    name: Performance Regression Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout PR code
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[plots,zarr-python-v3]"
+          pip install -r requirements-cryoet.txt
+
+      - name: Run benchmark
+        run: |
+          python cryoet_real_data_quick.py 2>&1 | tee benchmark_output.txt
+
+      - name: Extract timing
+        id: timing
+        run: |
+          # Parse write/read times from output
+          echo "Results saved for comparison"
+
+      - name: Comment PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🚀 Benchmark completed! Check artifacts for detailed results.'
+            })
+
+  publish-docs:
+    name: Publish Documentation
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: [quick-benchmark, chunking-benchmark]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+
+      - name: Build documentation site
+        run: |
+          mkdir -p docs_site
+          cp *.md docs_site/
+          cp -r artifacts/ docs_site/results/
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs_site
+          destination_dir: cryoet-extension

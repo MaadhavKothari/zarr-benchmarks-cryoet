@@ -17,6 +17,9 @@ scikit-image==0.25.2
 # CryoET Data Portal
 cryoet_data_portal==4.5.0
 
+# Format Conversion & I/O
+iohub>=0.2.2  # OME-Zarr, TIFF, NDTiff conversion
+
 # Jupyter Notebooks
 jupyterlab==4.4.10
 notebook==7.4.1

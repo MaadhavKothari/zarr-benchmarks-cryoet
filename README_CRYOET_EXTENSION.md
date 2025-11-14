@@ -40,6 +40,16 @@ This repository extends the [HEFTIE zarr-benchmarks](https://github.com/HEFTIEPr
    - Confirms lossless compression integrity
    - Ready for lossy compression exploration (ZFP, SZ3)
 
+6. **✅ Zarr v2 vs v3 Comparison** 🆕
+   - Direct performance comparison between versions
+   - File count and storage efficiency analysis
+   - Compatibility and ecosystem considerations
+
+7. **✅ iohub Format Conversion** 🆕
+   - TIFF ↔ OME-Zarr conversion benchmarking
+   - Multi-format pipeline testing
+   - Legacy data migration validation
+
 ---
 
 ## 📊 Quick Results Summary
@@ -164,8 +174,11 @@ zarr-benchmarks/
 │
 ├── 📓 Notebooks/
 │   ├── comprehensive_cryoet_notebook.ipynb  # Complete benchmark suite
-│   ├── cryoet_portal_benchmark.ipynb        # CryoET-specific notebook
-│   └── zarr_benchmarks_demo.ipynb           # General zarr demo
+│   ├── zarr_v2_v3_comparison.ipynb          # v2 vs v3 performance 🆕
+│   ├── iohub_conversion_benchmark.ipynb     # Format conversion tests 🆕
+│   ├── advanced_compression_matrix.ipynb    # Heat maps & Pareto analysis
+│   ├── cryoet_qc_benchmark_tool.ipynb       # PixelPatrol-inspired QC
+│   └── cryoet_portal_benchmark.ipynb        # CryoET-specific notebook
 │
 ├── 📊 Outputs/
 │   ├── data/output/cryoet_viz/              # Visualizations

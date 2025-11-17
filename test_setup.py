@@ -24,10 +24,7 @@ output_dir.mkdir(parents=True, exist_ok=True)
 store_path = output_dir / "test_blosc.zarr"
 
 blosc_compressor = read_write_zarr.get_blosc_compressor(
-    cname="zstd",
-    clevel=5,
-    shuffle="shuffle",
-    zarr_spec=3
+    cname="zstd", clevel=5, shuffle="shuffle", zarr_spec=3
 )
 
 utils.remove_output_dir(store_path)
@@ -38,7 +35,7 @@ read_write_zarr.write_zarr_array(
     overwrite=False,
     chunks=(64, 64, 64),
     compressor=blosc_compressor,
-    zarr_spec=3
+    zarr_spec=3,
 )
 write_time = time.time() - start_time
 print(f"   Write time: {write_time:.3f}s")

@@ -12,8 +12,8 @@ from typing import Tuple, Literal
 def generate_synthetic_volume(
     size: int = 256,
     dtype: np.dtype = np.float32,
-    pattern: Literal['noise', 'gradient', 'spheres', 'realistic'] = 'realistic',
-    seed: int = 42
+    pattern: Literal["noise", "gradient", "spheres", "realistic"] = "realistic",
+    seed: int = 42,
 ) -> np.ndarray:
     """
     Generate synthetic 3D volume for testing.
@@ -40,16 +40,16 @@ def generate_synthetic_volume(
     """
     np.random.seed(seed)
 
-    if pattern == 'noise':
+    if pattern == "noise":
         # Pure Gaussian noise
         data = np.random.randn(size, size, size).astype(dtype)
 
-    elif pattern == 'gradient':
+    elif pattern == "gradient":
         # Smooth 3D gradient
         z, y, x = np.mgrid[0:size, 0:size, 0:size]
         data = (z + y + x).astype(dtype) / (3 * size)
 
-    elif pattern == 'spheres':
+    elif pattern == "spheres":
         # Multiple spheres with different intensities
         data = np.zeros((size, size, size), dtype=dtype)
         z, y, x = np.mgrid[0:size, 0:size, 0:size]
@@ -62,11 +62,11 @@ def generate_synthetic_volume(
             radius = np.random.randint(size // 8, size // 4)
             intensity = np.random.rand() * 10
 
-            dist = np.sqrt((z - center_z)**2 + (y - center_y)**2 + (x - center_x)**2)
-            sphere = intensity * np.exp(-(dist**2) / (2 * (radius/2)**2))
+            dist = np.sqrt((z - center_z) ** 2 + (y - center_y) ** 2 + (x - center_x) ** 2)
+            sphere = intensity * np.exp(-(dist**2) / (2 * (radius / 2) ** 2))
             data += sphere
 
-    elif pattern == 'realistic':
+    elif pattern == "realistic":
         # Simulate realistic microscopy data
         # Base noise
         data = np.random.randn(size, size, size).astype(dtype) * 0.1
@@ -82,8 +82,8 @@ def generate_synthetic_volume(
             radius = np.random.randint(size // 12, size // 6)
             intensity = np.random.rand() * 2 + 1
 
-            dist = np.sqrt((z - center_z)**2 + (y - center_y)**2 + (x - center_x)**2)
-            sphere = intensity * np.exp(-(dist**2) / (2 * (radius/2)**2))
+            dist = np.sqrt((z - center_z) ** 2 + (y - center_y) ** 2 + (x - center_x) ** 2)
+            sphere = intensity * np.exp(-(dist**2) / (2 * (radius / 2) ** 2))
             data += sphere
 
         # Elongated features (filaments)
@@ -105,9 +105,9 @@ def generate_synthetic_volume(
                 pt_x = int(start_x + direction[2] * t) % size
 
                 # Add thickness
-                for dz in range(-thickness, thickness+1):
-                    for dy in range(-thickness, thickness+1):
-                        for dx in range(-thickness, thickness+1):
+                for dz in range(-thickness, thickness + 1):
+                    for dy in range(-thickness, thickness + 1):
+                        for dx in range(-thickness, thickness + 1):
                             if np.sqrt(dz**2 + dy**2 + dx**2) <= thickness:
                                 iz = (pt_z + dz) % size
                                 iy = (pt_y + dy) % size
@@ -115,10 +115,13 @@ def generate_synthetic_volume(
                                 data[iz, iy, ix] += intensity
 
         # Add smooth background variation
-        z_low, y_low, x_low = np.mgrid[0:size:size//4, 0:size:size//4, 0:size:size//4]
-        background = np.random.randn(size//4, size//4, size//4) * 0.5
+        z_low, y_low, x_low = np.mgrid[
+            0 : size : size // 4, 0 : size : size // 4, 0 : size : size // 4
+        ]
+        background = np.random.randn(size // 4, size // 4, size // 4) * 0.5
 
         from scipy.ndimage import zoom
+
         background_full = zoom(background, 4, order=3)[:size, :size, :size]
         data += background_full
 
@@ -131,7 +134,7 @@ def generate_synthetic_volume(
     return data
 
 
-def get_test_dataset_info(pattern: str = 'realistic') -> dict:
+def get_test_dataset_info(pattern: str = "realistic") -> dict:
     """
     Get description and properties of test dataset.
 
@@ -146,40 +149,40 @@ def get_test_dataset_info(pattern: str = 'realistic') -> dict:
         Dataset metadata and description
     """
     descriptions = {
-        'noise': {
-            'name': 'Gaussian Noise',
-            'description': 'Pure random Gaussian noise - tests high entropy data',
-            'compressibility': 'Poor (high entropy)',
-            'use_case': 'Worst-case compression testing'
+        "noise": {
+            "name": "Gaussian Noise",
+            "description": "Pure random Gaussian noise - tests high entropy data",
+            "compressibility": "Poor (high entropy)",
+            "use_case": "Worst-case compression testing",
         },
-        'gradient': {
-            'name': 'Smooth Gradient',
-            'description': 'Smooth 3D gradient - tests low entropy data',
-            'compressibility': 'Excellent (low entropy)',
-            'use_case': 'Best-case compression testing'
+        "gradient": {
+            "name": "Smooth Gradient",
+            "description": "Smooth 3D gradient - tests low entropy data",
+            "compressibility": "Excellent (low entropy)",
+            "use_case": "Best-case compression testing",
         },
-        'spheres': {
-            'name': 'Multiple Spheres',
-            'description': 'Random spheres with varying intensity',
-            'compressibility': 'Good (structured data)',
-            'use_case': 'Segmentation-like data testing'
+        "spheres": {
+            "name": "Multiple Spheres",
+            "description": "Random spheres with varying intensity",
+            "compressibility": "Good (structured data)",
+            "use_case": "Segmentation-like data testing",
         },
-        'realistic': {
-            'name': 'Realistic Microscopy',
-            'description': 'Simulated microscopy with structures, filaments, and noise',
-            'compressibility': 'Moderate (similar to real data)',
-            'use_case': 'Realistic benchmarking'
-        }
+        "realistic": {
+            "name": "Realistic Microscopy",
+            "description": "Simulated microscopy with structures, filaments, and noise",
+            "compressibility": "Moderate (similar to real data)",
+            "use_case": "Realistic benchmarking",
+        },
     }
 
     return descriptions.get(pattern, {})
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Test generation
     print("Testing synthetic data generation...")
 
-    for pattern in ['noise', 'gradient', 'spheres', 'realistic']:
+    for pattern in ["noise", "gradient", "spheres", "realistic"]:
         print(f"\n{pattern.upper()}:")
         data = generate_synthetic_volume(size=128, pattern=pattern)
         info = get_test_dataset_info(pattern)

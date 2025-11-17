@@ -1,0 +1,4 @@
+version,write_time,read_time,size_mb,ratio,file_count,success,error
+v2,0.01824784278869629,0.0029802322387695312,6.586516380310059,1.2146026120750955,9.0,True,
+v3,,,,,,False,"# V3 reading and writing is experimental! To enable support, set:
+ZARR_V3_EXPERIMENTAL_API=1"

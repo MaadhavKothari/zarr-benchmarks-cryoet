@@ -1,0 +1,6 @@
+codec,exact_match,ssim,psnr,mse,mae,max_error,correlation,success
+blosc_zstd,True,1.0,inf,0.0,0.0,0.0,1.0,True
+blosc_lz4,True,1.0,inf,0.0,0.0,0.0,1.0,True
+blosc_zlib,True,1.0,inf,0.0,0.0,0.0,1.0,True
+zstd,True,1.0,inf,0.0,0.0,0.0,1.0,True
+gzip,True,1.0,inf,0.0,0.0,0.0,1.0,True

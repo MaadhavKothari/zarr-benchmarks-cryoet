@@ -13,6 +13,7 @@ try:
     from cryoet_data_portal import Client, Dataset, Run, Tomogram
     import s3fs
     import zarr
+
     print("   ✓ All imports successful")
 except ImportError as e:
     print(f"   ✗ Import failed: {e}")
@@ -64,7 +65,7 @@ except Exception as e:
 print("\n6. Testing S3 access...")
 try:
     s3 = s3fs.S3FileSystem(anon=True)
-    zarr_path = first_tomo.s3_omezarr_dir.replace('s3://', '')
+    zarr_path = first_tomo.s3_omezarr_dir.replace("s3://", "")
     print(f"   ✓ S3 filesystem created")
     print(f"   ✓ Accessing: {zarr_path}")
 except Exception as e:
@@ -74,7 +75,7 @@ except Exception as e:
 print("\n7. Opening zarr group and exploring structure...")
 try:
     store = s3fs.S3Map(root=zarr_path, s3=s3, check=False)
-    zarr_group = zarr.open(store, mode='r')
+    zarr_group = zarr.open(store, mode="r")
     print(f"   ✓ Zarr group opened")
     print(f"   ✓ Type: {type(zarr_group)}")
 
@@ -82,15 +83,15 @@ try:
     print(f"\n   Group contents:")
     for key in zarr_group.keys():
         item = zarr_group[key]
-        if hasattr(item, 'shape'):
+        if hasattr(item, "shape"):
             print(f"     - {key}: array, shape={item.shape}, dtype={item.dtype}")
         else:
             print(f"     - {key}: group")
 
     # Try to find the actual data array
     # Common OME-Zarr structure has data at '/0' or similar
-    if '0' in zarr_group:
-        zarr_array = zarr_group['0']
+    if "0" in zarr_group:
+        zarr_array = zarr_group["0"]
         print(f"\n   ✓ Found data array at '/0'")
         print(f"   ✓ Shape: {zarr_array.shape}")
         print(f"   ✓ Dtype: {zarr_array.dtype}")
@@ -104,6 +105,7 @@ try:
 except Exception as e:
     print(f"   ✗ Failed to open zarr: {e}")
     import traceback
+
     traceback.print_exc()
     exit(1)
 

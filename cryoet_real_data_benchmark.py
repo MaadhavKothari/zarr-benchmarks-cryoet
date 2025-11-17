@@ -49,11 +49,11 @@ print(f"   ✓ Total tomograms in dataset: {len(tomograms)} (in this run)")
 # ============================================================================
 print("\n☁️  3. Accessing Zarr data from S3...")
 s3 = s3fs.S3FileSystem(anon=True)
-zarr_path = first_tomo.s3_omezarr_dir.replace('s3://', '')
+zarr_path = first_tomo.s3_omezarr_dir.replace("s3://", "")
 
 store = s3fs.S3Map(root=zarr_path, s3=s3, check=False)
-zarr_group = zarr.open(store, mode='r')
-zarr_array = zarr_group['0']  # Full resolution data
+zarr_group = zarr.open(store, mode="r")
+zarr_array = zarr_group["0"]  # Full resolution data
 
 print(f"   ✓ Shape: {zarr_array.shape} (Z, Y, X)")
 print(f"   ✓ Dtype: {zarr_array.dtype}")
@@ -103,33 +103,35 @@ print(f"   ✓ Data std: {real_data.std():.3f}")
 print("\n📸 5. Visualizing the cryo-EM tomogram data...")
 
 fig = plt.figure(figsize=(16, 12))
-fig.suptitle(f'CryoET Data: {first_tomo.name} (Dataset {dataset.id})', fontsize=16, fontweight='bold')
+fig.suptitle(
+    f"CryoET Data: {first_tomo.name} (Dataset {dataset.id})", fontsize=16, fontweight="bold"
+)
 
 # XY slices at different Z positions
-for i, z_pos in enumerate([actual_shape[0]//4, actual_shape[0]//2, 3*actual_shape[0]//4]):
-    ax = plt.subplot(3, 3, i+1)
-    im = ax.imshow(real_data[z_pos, :, :], cmap='gray', vmin=real_data.min(), vmax=real_data.max())
-    ax.set_title(f'XY Slice (Z={z_pos})')
-    ax.set_xlabel('X')
-    ax.set_ylabel('Y')
+for i, z_pos in enumerate([actual_shape[0] // 4, actual_shape[0] // 2, 3 * actual_shape[0] // 4]):
+    ax = plt.subplot(3, 3, i + 1)
+    im = ax.imshow(real_data[z_pos, :, :], cmap="gray", vmin=real_data.min(), vmax=real_data.max())
+    ax.set_title(f"XY Slice (Z={z_pos})")
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
     plt.colorbar(im, ax=ax, fraction=0.046)
 
 # XZ slices at different Y positions
-for i, y_pos in enumerate([actual_shape[1]//4, actual_shape[1]//2, 3*actual_shape[1]//4]):
-    ax = plt.subplot(3, 3, i+4)
-    im = ax.imshow(real_data[:, y_pos, :], cmap='gray', vmin=real_data.min(), vmax=real_data.max())
-    ax.set_title(f'XZ Slice (Y={y_pos})')
-    ax.set_xlabel('X')
-    ax.set_ylabel('Z')
+for i, y_pos in enumerate([actual_shape[1] // 4, actual_shape[1] // 2, 3 * actual_shape[1] // 4]):
+    ax = plt.subplot(3, 3, i + 4)
+    im = ax.imshow(real_data[:, y_pos, :], cmap="gray", vmin=real_data.min(), vmax=real_data.max())
+    ax.set_title(f"XZ Slice (Y={y_pos})")
+    ax.set_xlabel("X")
+    ax.set_ylabel("Z")
     plt.colorbar(im, ax=ax, fraction=0.046)
 
 # YZ slices at different X positions
-for i, x_pos in enumerate([actual_shape[2]//4, actual_shape[2]//2, 3*actual_shape[2]//4]):
-    ax = plt.subplot(3, 3, i+7)
-    im = ax.imshow(real_data[:, :, x_pos], cmap='gray', vmin=real_data.min(), vmax=real_data.max())
-    ax.set_title(f'YZ Slice (X={x_pos})')
-    ax.set_xlabel('Y')
-    ax.set_ylabel('Z')
+for i, x_pos in enumerate([actual_shape[2] // 4, actual_shape[2] // 2, 3 * actual_shape[2] // 4]):
+    ax = plt.subplot(3, 3, i + 7)
+    im = ax.imshow(real_data[:, :, x_pos], cmap="gray", vmin=real_data.min(), vmax=real_data.max())
+    ax.set_title(f"YZ Slice (X={x_pos})")
+    ax.set_xlabel("Y")
+    ax.set_ylabel("Z")
     plt.colorbar(im, ax=ax, fraction=0.046)
 
 plt.tight_layout()
@@ -137,7 +139,7 @@ plt.tight_layout()
 viz_dir = pathlib.Path("data/output/cryoet_viz")
 viz_dir.mkdir(parents=True, exist_ok=True)
 viz_path = viz_dir / "cryoet_data_slices.png"
-plt.savefig(viz_path, dpi=150, bbox_inches='tight')
+plt.savefig(viz_path, dpi=150, bbox_inches="tight")
 print(f"   ✓ Visualization saved to: {viz_path}")
 plt.show()
 
@@ -149,26 +151,26 @@ print("\n📊 6. Analyzing data distribution...")
 fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 
 # Histogram
-axes[0].hist(real_data.flatten(), bins=100, color='steelblue', alpha=0.7, edgecolor='black')
-axes[0].set_xlabel('Voxel Intensity')
-axes[0].set_ylabel('Frequency')
-axes[0].set_title(f'CryoET Data Distribution\n{first_tomo.name}')
+axes[0].hist(real_data.flatten(), bins=100, color="steelblue", alpha=0.7, edgecolor="black")
+axes[0].set_xlabel("Voxel Intensity")
+axes[0].set_ylabel("Frequency")
+axes[0].set_title(f"CryoET Data Distribution\n{first_tomo.name}")
 axes[0].grid(True, alpha=0.3)
 
 # Box plot by slice
 sample_slices = [
-    real_data[actual_shape[0]//4, :, :].flatten(),
-    real_data[actual_shape[0]//2, :, :].flatten(),
-    real_data[3*actual_shape[0]//4, :, :].flatten()
+    real_data[actual_shape[0] // 4, :, :].flatten(),
+    real_data[actual_shape[0] // 2, :, :].flatten(),
+    real_data[3 * actual_shape[0] // 4, :, :].flatten(),
 ]
-axes[1].boxplot(sample_slices, tick_labels=['Z=Q1', 'Z=Q2', 'Z=Q3'])
-axes[1].set_ylabel('Voxel Intensity')
-axes[1].set_title('Distribution Across Z Slices')
+axes[1].boxplot(sample_slices, tick_labels=["Z=Q1", "Z=Q2", "Z=Q3"])
+axes[1].set_ylabel("Voxel Intensity")
+axes[1].set_title("Distribution Across Z Slices")
 axes[1].grid(True, alpha=0.3)
 
 plt.tight_layout()
 dist_path = viz_dir / "cryoet_distribution.png"
-plt.savefig(dist_path, dpi=150, bbox_inches='tight')
+plt.savefig(dist_path, dpi=150, bbox_inches="tight")
 print(f"   ✓ Distribution analysis saved to: {dist_path}")
 plt.show()
 
@@ -192,11 +194,19 @@ zarr_spec = 3
 
 results = {}
 compression_methods = [
-    ('blosc_zstd', 'Blosc-Zstd', lambda: read_write_zarr.get_blosc_compressor("zstd", 5, "shuffle", zarr_spec)),
-    ('blosc_lz4', 'Blosc-LZ4 (Original)', lambda: read_write_zarr.get_blosc_compressor("lz4", 5, "shuffle", zarr_spec)),
-    ('gzip', 'GZip', lambda: read_write_zarr.get_gzip_compressor(6, zarr_spec)),
-    ('zstd', 'Zstd', lambda: read_write_zarr.get_zstd_compressor(5, zarr_spec)),
-    ('no_compression', 'No Compression', lambda: None),
+    (
+        "blosc_zstd",
+        "Blosc-Zstd",
+        lambda: read_write_zarr.get_blosc_compressor("zstd", 5, "shuffle", zarr_spec),
+    ),
+    (
+        "blosc_lz4",
+        "Blosc-LZ4 (Original)",
+        lambda: read_write_zarr.get_blosc_compressor("lz4", 5, "shuffle", zarr_spec),
+    ),
+    ("gzip", "GZip", lambda: read_write_zarr.get_gzip_compressor(6, zarr_spec)),
+    ("zstd", "Zstd", lambda: read_write_zarr.get_zstd_compressor(5, zarr_spec)),
+    ("no_compression", "No Compression", lambda: None),
 ]
 
 for method_key, method_name, get_compressor in compression_methods:
@@ -212,7 +222,7 @@ for method_key, method_name, get_compressor in compression_methods:
         overwrite=False,
         chunks=chunks,
         compressor=compressor,
-        zarr_spec=zarr_spec
+        zarr_spec=zarr_spec,
     )
     write_time = time.time() - start_time
 
@@ -224,10 +234,10 @@ for method_key, method_name, get_compressor in compression_methods:
     storage_size = utils.get_directory_size(store_path) / (1024**2)
 
     results[method_key] = {
-        'write_time': write_time,
-        'read_time': read_time,
-        'compression_ratio': compression_ratio,
-        'storage_size_mb': storage_size
+        "write_time": write_time,
+        "read_time": read_time,
+        "compression_ratio": compression_ratio,
+        "storage_size_mb": storage_size,
     }
 
     print(f"   ✓ Write time: {write_time:.3f}s")
@@ -245,7 +255,7 @@ print("=" * 70)
 
 summary_df = pd.DataFrame(results).T
 summary_df = summary_df.round(3)
-summary_df.columns = ['Write Time (s)', 'Read Time (s)', 'Compression Ratio', 'Storage Size (MB)']
+summary_df.columns = ["Write Time (s)", "Read Time (s)", "Compression Ratio", "Storage Size (MB)"]
 
 print("\n" + summary_df.to_string())
 
@@ -261,38 +271,41 @@ print(f"   Smallest storage: {summary_df['Storage Size (MB)'].idxmin()}")
 print("\n📊 Generating comparison plots...")
 
 fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-fig.suptitle(f'Compression Benchmark Results: CryoET Data ({first_tomo.name})',
-             fontsize=14, fontweight='bold')
+fig.suptitle(
+    f"Compression Benchmark Results: CryoET Data ({first_tomo.name})",
+    fontsize=14,
+    fontweight="bold",
+)
 
 methods = list(results.keys())
-write_times = [results[m]['write_time'] for m in methods]
-read_times = [results[m]['read_time'] for m in methods]
-compression_ratios = [results[m]['compression_ratio'] for m in methods]
-storage_sizes = [results[m]['storage_size_mb'] for m in methods]
+write_times = [results[m]["write_time"] for m in methods]
+read_times = [results[m]["read_time"] for m in methods]
+compression_ratios = [results[m]["compression_ratio"] for m in methods]
+storage_sizes = [results[m]["storage_size_mb"] for m in methods]
 
-axes[0, 0].bar(methods, write_times, color='steelblue')
-axes[0, 0].set_ylabel('Time (seconds)')
-axes[0, 0].set_title('Write Performance')
-axes[0, 0].tick_params(axis='x', rotation=45)
+axes[0, 0].bar(methods, write_times, color="steelblue")
+axes[0, 0].set_ylabel("Time (seconds)")
+axes[0, 0].set_title("Write Performance")
+axes[0, 0].tick_params(axis="x", rotation=45)
 
-axes[0, 1].bar(methods, read_times, color='coral')
-axes[0, 1].set_ylabel('Time (seconds)')
-axes[0, 1].set_title('Read Performance')
-axes[0, 1].tick_params(axis='x', rotation=45)
+axes[0, 1].bar(methods, read_times, color="coral")
+axes[0, 1].set_ylabel("Time (seconds)")
+axes[0, 1].set_title("Read Performance")
+axes[0, 1].tick_params(axis="x", rotation=45)
 
-axes[1, 0].bar(methods, compression_ratios, color='green')
-axes[1, 0].set_ylabel('Compression Ratio')
-axes[1, 0].set_title('Compression Ratio (Higher is Better)')
-axes[1, 0].tick_params(axis='x', rotation=45)
+axes[1, 0].bar(methods, compression_ratios, color="green")
+axes[1, 0].set_ylabel("Compression Ratio")
+axes[1, 0].set_title("Compression Ratio (Higher is Better)")
+axes[1, 0].tick_params(axis="x", rotation=45)
 
-axes[1, 1].bar(methods, storage_sizes, color='purple')
-axes[1, 1].set_ylabel('Size (MB)')
-axes[1, 1].set_title('Storage Size (Lower is Better)')
-axes[1, 1].tick_params(axis='x', rotation=45)
+axes[1, 1].bar(methods, storage_sizes, color="purple")
+axes[1, 1].set_ylabel("Size (MB)")
+axes[1, 1].set_title("Storage Size (Lower is Better)")
+axes[1, 1].tick_params(axis="x", rotation=45)
 
 plt.tight_layout()
 plot_path = output_dir / "cryoet_benchmark_comparison.png"
-plt.savefig(plot_path, dpi=150, bbox_inches='tight')
+plt.savefig(plot_path, dpi=150, bbox_inches="tight")
 print(f"   ✓ Plot saved to: {plot_path}")
 plt.show()
 
@@ -318,9 +331,9 @@ print(f"  - Comparison plot: {plot_path}")
 
 print(f"\n💡 Key Findings:")
 original_size = real_data.nbytes / (1024**2)
-best_method = summary_df['Compression Ratio'].idxmax()
-best_ratio = summary_df.loc[best_method, 'Compression Ratio']
-best_size = summary_df.loc[best_method, 'Storage Size (MB)']
+best_method = summary_df["Compression Ratio"].idxmax()
+best_ratio = summary_df.loc[best_method, "Compression Ratio"]
+best_size = summary_df.loc[best_method, "Storage Size (MB)"]
 savings = original_size - best_size
 
 print(f"  - Original size: {original_size:.2f} MB")

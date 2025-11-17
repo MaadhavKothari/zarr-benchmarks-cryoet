@@ -36,21 +36,23 @@ print(f"   ✓ Tomogram: {first_tomo.name}")
 
 # Access S3 data
 s3 = s3fs.S3FileSystem(anon=True)
-zarr_path = first_tomo.s3_omezarr_dir.replace('s3://', '')
+zarr_path = first_tomo.s3_omezarr_dir.replace("s3://", "")
 store = s3fs.S3Map(root=zarr_path, s3=s3, check=False)
-zarr_group = zarr.open(store, mode='r')
-zarr_array = zarr_group['0']
+zarr_group = zarr.open(store, mode="r")
+zarr_array = zarr_group["0"]
 
 # Download 128³ subset from center
-z_c, y_c, x_c = zarr_array.shape[0]//2, zarr_array.shape[1]//2, zarr_array.shape[2]//2
+z_c, y_c, x_c = zarr_array.shape[0] // 2, zarr_array.shape[1] // 2, zarr_array.shape[2] // 2
 size = 128
 
 start_time = time.time()
-real_data = np.array(zarr_array[
-    max(0, z_c-size//2):min(zarr_array.shape[0], z_c+size//2),
-    max(0, y_c-size//2):min(zarr_array.shape[1], y_c+size//2),
-    max(0, x_c-size//2):min(zarr_array.shape[2], x_c+size//2)
-])
+real_data = np.array(
+    zarr_array[
+        max(0, z_c - size // 2) : min(zarr_array.shape[0], z_c + size // 2),
+        max(0, y_c - size // 2) : min(zarr_array.shape[1], y_c + size // 2),
+        max(0, x_c - size // 2) : min(zarr_array.shape[2], x_c + size // 2),
+    ]
+)
 download_time = time.time() - start_time
 
 print(f"   ✓ Downloaded {real_data.shape} in {download_time:.2f}s")
@@ -60,11 +62,12 @@ print(f"   ✓ Size: {real_data.nbytes / (1024**2):.2f} MB")
 # 2. HELPER FUNCTIONS
 # ============================================================================
 
+
 def count_files_in_zarr(store_path: pathlib.Path) -> int:
     """Count total files in zarr store (including metadata)"""
     count = 0
     if store_path.exists():
-        for item in store_path.rglob('*'):
+        for item in store_path.rglob("*"):
             if item.is_file():
                 count += 1
     return count
@@ -112,10 +115,7 @@ def write_zarr_v3_with_sharding(data, store_path, chunk_shape, shard_shape, comp
     if compressor is not None:
         inner_codecs.append(compressor)
 
-    sharding_codec = ShardingCodec(
-        chunk_shape=chunk_shape,
-        codecs=inner_codecs
-    )
+    sharding_codec = ShardingCodec(chunk_shape=chunk_shape, codecs=inner_codecs)
 
     zarr.create_array(
         store=store_path,
@@ -137,7 +137,7 @@ def benchmark_config(name, data, store_path, write_func, read_verify=True):
 
     # Read
     t0 = time.time()
-    zarr_read = zarr.open_array(store_path, mode='r')
+    zarr_read = zarr.open_array(store_path, mode="r")
     read_back = zarr_read[:]
     read_time = time.time() - t0
 
@@ -151,12 +151,12 @@ def benchmark_config(name, data, store_path, write_func, read_verify=True):
     compression_ratio = data.nbytes / (storage_size * 1024**2)
 
     return {
-        'name': name,
-        'write_time': write_time,
-        'read_time': read_time,
-        'storage_mb': storage_size,
-        'compression_ratio': compression_ratio,
-        'file_count': file_count
+        "name": name,
+        "write_time": write_time,
+        "read_time": read_time,
+        "storage_mb": storage_size,
+        "compression_ratio": compression_ratio,
+        "file_count": file_count,
     }
 
 
@@ -171,7 +171,7 @@ output_dir.mkdir(parents=True, exist_ok=True)
 
 # Compression to test
 blosc_zstd_v2 = zarr.storage.default_compressor  # v2 style
-blosc_zstd_v3 = BloscCodec(cname='zstd', clevel=5, shuffle='shuffle')
+blosc_zstd_v3 = BloscCodec(cname="zstd", clevel=5, shuffle="shuffle")
 
 results = []
 
@@ -188,12 +188,14 @@ for chunk_size in [32, 64, 128]:
         f"v2_chunk{chunk_size}",
         real_data,
         store_path,
-        lambda: write_zarr_v2(real_data, store_path, chunks, blosc_zstd_v2)
+        lambda: write_zarr_v2(real_data, store_path, chunks, blosc_zstd_v2),
     )
     results.append(result)
-    print(f"      Chunk {chunk_size}³: Write={result['write_time']:.3f}s, "
-          f"Read={result['read_time']:.3f}s, Files={result['file_count']}, "
-          f"Size={result['storage_mb']:.2f}MB")
+    print(
+        f"      Chunk {chunk_size}³: Write={result['write_time']:.3f}s, "
+        f"Read={result['read_time']:.3f}s, Files={result['file_count']}, "
+        f"Size={result['storage_mb']:.2f}MB"
+    )
 
 # ============================================================================
 # Test 2: Zarr v3 without sharding (for fair comparison)
@@ -209,16 +211,15 @@ for chunk_size in [32, 64, 128]:
         real_data,
         store_path,
         lambda cs=chunk_size: write_zarr_v3_no_sharding(
-            real_data,
-            output_dir / f"v3_no_shard_chunks_{cs}.zarr",
-            (cs, cs, cs),
-            blosc_zstd_v3
-        )
+            real_data, output_dir / f"v3_no_shard_chunks_{cs}.zarr", (cs, cs, cs), blosc_zstd_v3
+        ),
     )
     results.append(result)
-    print(f"      Chunk {chunk_size}³: Write={result['write_time']:.3f}s, "
-          f"Read={result['read_time']:.3f}s, Files={result['file_count']}, "
-          f"Size={result['storage_mb']:.2f}MB")
+    print(
+        f"      Chunk {chunk_size}³: Write={result['write_time']:.3f}s, "
+        f"Read={result['read_time']:.3f}s, Files={result['file_count']}, "
+        f"Size={result['storage_mb']:.2f}MB"
+    )
 
 # ============================================================================
 # Test 3: Zarr v3 WITH sharding - various configurations
@@ -234,16 +235,19 @@ result = benchmark_config(
     real_data,
     store_path,
     lambda: write_zarr_v3_with_sharding(
-        real_data, store_path,
-        chunk_shape=(32, 32, 32),   # Read granularity
-        shard_shape=(128, 128, 128), # Write efficiency
-        compressor=blosc_zstd_v3
-    )
+        real_data,
+        store_path,
+        chunk_shape=(32, 32, 32),  # Read granularity
+        shard_shape=(128, 128, 128),  # Write efficiency
+        compressor=blosc_zstd_v3,
+    ),
 )
 results.append(result)
-print(f"      Chunk 32³ → Shard 128³: Write={result['write_time']:.3f}s, "
-      f"Read={result['read_time']:.3f}s, Files={result['file_count']}, "
-      f"Size={result['storage_mb']:.2f}MB")
+print(
+    f"      Chunk 32³ → Shard 128³: Write={result['write_time']:.3f}s, "
+    f"Read={result['read_time']:.3f}s, Files={result['file_count']}, "
+    f"Size={result['storage_mb']:.2f}MB"
+)
 
 # Configuration 2: Medium chunks (64³), large shards (128³)
 config_name = "v3_shard_c64_s128"
@@ -253,16 +257,19 @@ result = benchmark_config(
     real_data,
     store_path,
     lambda: write_zarr_v3_with_sharding(
-        real_data, store_path,
+        real_data,
+        store_path,
         chunk_shape=(64, 64, 64),
         shard_shape=(128, 128, 128),
-        compressor=blosc_zstd_v3
-    )
+        compressor=blosc_zstd_v3,
+    ),
 )
 results.append(result)
-print(f"      Chunk 64³ → Shard 128³: Write={result['write_time']:.3f}s, "
-      f"Read={result['read_time']:.3f}s, Files={result['file_count']}, "
-      f"Size={result['storage_mb']:.2f}MB")
+print(
+    f"      Chunk 64³ → Shard 128³: Write={result['write_time']:.3f}s, "
+    f"Read={result['read_time']:.3f}s, Files={result['file_count']}, "
+    f"Size={result['storage_mb']:.2f}MB"
+)
 
 # Configuration 3: Very small chunks (16³), medium shards (128³)
 # Extreme read granularity - useful for random access
@@ -273,16 +280,19 @@ result = benchmark_config(
     real_data,
     store_path,
     lambda: write_zarr_v3_with_sharding(
-        real_data, store_path,
+        real_data,
+        store_path,
         chunk_shape=(16, 16, 16),
         shard_shape=(128, 128, 128),
-        compressor=blosc_zstd_v3
-    )
+        compressor=blosc_zstd_v3,
+    ),
 )
 results.append(result)
-print(f"      Chunk 16³ → Shard 128³: Write={result['write_time']:.3f}s, "
-      f"Read={result['read_time']:.3f}s, Files={result['file_count']}, "
-      f"Size={result['storage_mb']:.2f}MB")
+print(
+    f"      Chunk 16³ → Shard 128³: Write={result['write_time']:.3f}s, "
+    f"Read={result['read_time']:.3f}s, Files={result['file_count']}, "
+    f"Size={result['storage_mb']:.2f}MB"
+)
 
 # Configuration 4: Small chunks (32³), very large shards (entire volume)
 # Maximum write efficiency - single file
@@ -293,16 +303,19 @@ result = benchmark_config(
     real_data,
     store_path,
     lambda: write_zarr_v3_with_sharding(
-        real_data, store_path,
+        real_data,
+        store_path,
         chunk_shape=(32, 32, 32),
         shard_shape=real_data.shape,  # Entire volume in one shard
-        compressor=blosc_zstd_v3
-    )
+        compressor=blosc_zstd_v3,
+    ),
 )
 results.append(result)
-print(f"      Chunk 32³ → Shard {real_data.shape}: Write={result['write_time']:.3f}s, "
-      f"Read={result['read_time']:.3f}s, Files={result['file_count']}, "
-      f"Size={result['storage_mb']:.2f}MB")
+print(
+    f"      Chunk 32³ → Shard {real_data.shape}: Write={result['write_time']:.3f}s, "
+    f"Read={result['read_time']:.3f}s, Files={result['file_count']}, "
+    f"Size={result['storage_mb']:.2f}MB"
+)
 
 # ============================================================================
 # 4. RESULTS ANALYSIS
@@ -328,26 +341,30 @@ print("🔍 KEY INSIGHTS")
 print("=" * 80)
 
 # File count comparison
-v2_files = df[df['name'].str.startswith('v2')]['file_count'].mean()
-v3_noshard_files = df[df['name'].str.startswith('v3_noshard')]['file_count'].mean()
-v3_shard_files = df[df['name'].str.startswith('v3_shard')]['file_count'].mean()
+v2_files = df[df["name"].str.startswith("v2")]["file_count"].mean()
+v3_noshard_files = df[df["name"].str.startswith("v3_noshard")]["file_count"].mean()
+v3_shard_files = df[df["name"].str.startswith("v3_shard")]["file_count"].mean()
 
 print(f"\n📁 File Count Reduction:")
 print(f"   Zarr v2 average: {v2_files:.0f} files")
 print(f"   Zarr v3 (no shard) average: {v3_noshard_files:.0f} files")
 print(f"   Zarr v3 (with shard) average: {v3_shard_files:.0f} files")
-print(f"   Reduction: {((v2_files - v3_shard_files) / v2_files * 100):.1f}% fewer files with sharding")
+print(
+    f"   Reduction: {((v2_files - v3_shard_files) / v2_files * 100):.1f}% fewer files with sharding"
+)
 
 # Find best configurations
-best_write = df.loc[df['write_time'].idxmin()]
-best_read = df.loc[df['read_time'].idxmin()]
-best_compression = df.loc[df['compression_ratio'].idxmax()]
-fewest_files = df.loc[df['file_count'].idxmin()]
+best_write = df.loc[df["write_time"].idxmin()]
+best_read = df.loc[df["read_time"].idxmin()]
+best_compression = df.loc[df["compression_ratio"].idxmax()]
+fewest_files = df.loc[df["file_count"].idxmin()]
 
 print(f"\n🏆 Best Performers:")
 print(f"   Fastest write: {best_write['name']} ({best_write['write_time']:.3f}s)")
 print(f"   Fastest read: {best_read['name']} ({best_read['read_time']:.3f}s)")
-print(f"   Best compression: {best_compression['name']} ({best_compression['compression_ratio']:.2f}x)")
+print(
+    f"   Best compression: {best_compression['name']} ({best_compression['compression_ratio']:.2f}x)"
+)
 print(f"   Fewest files: {fewest_files['name']} ({fewest_files['file_count']} files)")
 
 # ============================================================================
@@ -356,84 +373,104 @@ print(f"   Fewest files: {fewest_files['name']} ({fewest_files['file_count']} fi
 print("\n📈 Generating comparison plots...")
 
 fig, axes = plt.subplots(2, 3, figsize=(18, 12))
-fig.suptitle('Zarr v3 Sharding Benchmark - CryoET Data', fontsize=16, fontweight='bold')
+fig.suptitle("Zarr v3 Sharding Benchmark - CryoET Data", fontsize=16, fontweight="bold")
 
 # Separate by category
-v2_data = df[df['name'].str.startswith('v2')]
-v3_noshard = df[df['name'].str.startswith('v3_noshard')]
-v3_shard = df[df['name'].str.startswith('v3_shard')]
+v2_data = df[df["name"].str.startswith("v2")]
+v3_noshard = df[df["name"].str.startswith("v3_noshard")]
+v3_shard = df[df["name"].str.startswith("v3_shard")]
 
-categories = ['v2', 'v3_noshard', 'v3_shard']
-colors = {'v2': '#FF6B6B', 'v3_noshard': '#4ECDC4', 'v3_shard': '#45B7D1'}
+categories = ["v2", "v3_noshard", "v3_shard"]
+colors = {"v2": "#FF6B6B", "v3_noshard": "#4ECDC4", "v3_shard": "#45B7D1"}
 
 # Plot 1: Write Performance
 ax = axes[0, 0]
-for cat, data in [('v2', v2_data), ('v3_noshard', v3_noshard), ('v3_shard', v3_shard)]:
-    ax.scatter(range(len(data)), data['write_time'],
-              label=cat.replace('_', ' ').title(),
-              color=colors[cat], s=100, alpha=0.7)
-ax.set_ylabel('Write Time (s)')
-ax.set_title('Write Performance')
+for cat, data in [("v2", v2_data), ("v3_noshard", v3_noshard), ("v3_shard", v3_shard)]:
+    ax.scatter(
+        range(len(data)),
+        data["write_time"],
+        label=cat.replace("_", " ").title(),
+        color=colors[cat],
+        s=100,
+        alpha=0.7,
+    )
+ax.set_ylabel("Write Time (s)")
+ax.set_title("Write Performance")
 ax.legend()
 ax.grid(True, alpha=0.3)
 
 # Plot 2: Read Performance
 ax = axes[0, 1]
-for cat, data in [('v2', v2_data), ('v3_noshard', v3_noshard), ('v3_shard', v3_shard)]:
-    ax.scatter(range(len(data)), data['read_time'],
-              label=cat.replace('_', ' ').title(),
-              color=colors[cat], s=100, alpha=0.7)
-ax.set_ylabel('Read Time (s)')
-ax.set_title('Read Performance')
+for cat, data in [("v2", v2_data), ("v3_noshard", v3_noshard), ("v3_shard", v3_shard)]:
+    ax.scatter(
+        range(len(data)),
+        data["read_time"],
+        label=cat.replace("_", " ").title(),
+        color=colors[cat],
+        s=100,
+        alpha=0.7,
+    )
+ax.set_ylabel("Read Time (s)")
+ax.set_title("Read Performance")
 ax.legend()
 ax.grid(True, alpha=0.3)
 
 # Plot 3: File Count (KEY METRIC!)
 ax = axes[0, 2]
-bars = ax.bar(df['name'], df['file_count'],
-             color=[colors[n.split('_')[0] + ('_' + n.split('_')[1] if 'noshard' in n else '')]
-                   for n in df['name']])
-ax.set_ylabel('File Count')
-ax.set_title('File Count (Lower is Better for Object Storage)')
-ax.tick_params(axis='x', rotation=90)
-ax.grid(True, alpha=0.3, axis='y')
+bars = ax.bar(
+    df["name"],
+    df["file_count"],
+    color=[
+        colors[n.split("_")[0] + ("_" + n.split("_")[1] if "noshard" in n else "")]
+        for n in df["name"]
+    ],
+)
+ax.set_ylabel("File Count")
+ax.set_title("File Count (Lower is Better for Object Storage)")
+ax.tick_params(axis="x", rotation=90)
+ax.grid(True, alpha=0.3, axis="y")
 
 # Plot 4: Compression Ratio
 ax = axes[1, 0]
-ax.bar(df['name'], df['compression_ratio'], color='green', alpha=0.6)
-ax.set_ylabel('Compression Ratio')
-ax.set_title('Compression Ratio')
-ax.tick_params(axis='x', rotation=90)
-ax.grid(True, alpha=0.3, axis='y')
+ax.bar(df["name"], df["compression_ratio"], color="green", alpha=0.6)
+ax.set_ylabel("Compression Ratio")
+ax.set_title("Compression Ratio")
+ax.tick_params(axis="x", rotation=90)
+ax.grid(True, alpha=0.3, axis="y")
 
 # Plot 5: Storage Size
 ax = axes[1, 1]
-ax.bar(df['name'], df['storage_mb'], color='purple', alpha=0.6)
-ax.set_ylabel('Storage Size (MB)')
-ax.set_title('Storage Size')
-ax.tick_params(axis='x', rotation=90)
-ax.grid(True, alpha=0.3, axis='y')
+ax.bar(df["name"], df["storage_mb"], color="purple", alpha=0.6)
+ax.set_ylabel("Storage Size (MB)")
+ax.set_title("Storage Size")
+ax.tick_params(axis="x", rotation=90)
+ax.grid(True, alpha=0.3, axis="y")
 
 # Plot 6: Write vs Read Trade-off
 ax = axes[1, 2]
-for cat, data in [('v2', v2_data), ('v3_noshard', v3_noshard), ('v3_shard', v3_shard)]:
-    ax.scatter(data['write_time'], data['read_time'],
-              label=cat.replace('_', ' ').title(),
-              color=colors[cat], s=150, alpha=0.7)
+for cat, data in [("v2", v2_data), ("v3_noshard", v3_noshard), ("v3_shard", v3_shard)]:
+    ax.scatter(
+        data["write_time"],
+        data["read_time"],
+        label=cat.replace("_", " ").title(),
+        color=colors[cat],
+        s=150,
+        alpha=0.7,
+    )
     # Add labels
     for _, row in data.iterrows():
-        ax.annotate(row['name'].split('_')[-1],
-                   (row['write_time'], row['read_time']),
-                   fontsize=8, alpha=0.7)
-ax.set_xlabel('Write Time (s)')
-ax.set_ylabel('Read Time (s)')
-ax.set_title('Write vs Read Trade-off (Lower-Left is Better)')
+        ax.annotate(
+            row["name"].split("_")[-1], (row["write_time"], row["read_time"]), fontsize=8, alpha=0.7
+        )
+ax.set_xlabel("Write Time (s)")
+ax.set_ylabel("Read Time (s)")
+ax.set_title("Write vs Read Trade-off (Lower-Left is Better)")
 ax.legend()
 ax.grid(True, alpha=0.3)
 
 plt.tight_layout()
 plot_path = output_dir / "sharding_comparison.png"
-plt.savefig(plot_path, dpi=150, bbox_inches='tight')
+plt.savefig(plot_path, dpi=150, bbox_inches="tight")
 print(f"✓ Plot saved to: {plot_path}")
 plt.close()
 

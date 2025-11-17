@@ -13,6 +13,7 @@ try:
     from cryoet_data_portal import Client, Dataset, Run, Tomogram
     import s3fs
     import zarr
+
     print("   ✓ All imports successful")
 except ImportError as e:
     print(f"   ✗ Import failed: {e}")
@@ -64,7 +65,7 @@ except Exception as e:
 print("\n6. Testing S3 access...")
 try:
     s3 = s3fs.S3FileSystem(anon=True)
-    zarr_path = first_tomo.s3_omezarr_dir.replace('s3://', '')
+    zarr_path = first_tomo.s3_omezarr_dir.replace("s3://", "")
     print(f"   ✓ S3 filesystem created")
     print(f"   ✓ Accessing: {zarr_path}")
 except Exception as e:
@@ -74,7 +75,7 @@ except Exception as e:
 print("\n7. Opening zarr array (metadata only)...")
 try:
     store = s3fs.S3Map(root=zarr_path, s3=s3, check=False)
-    zarr_array = zarr.open(store, mode='r')
+    zarr_array = zarr.open(store, mode="r")
     print(f"   ✓ Zarr array opened")
     print(f"   ✓ Shape: {zarr_array.shape}")
     print(f"   ✓ Dtype: {zarr_array.dtype}")

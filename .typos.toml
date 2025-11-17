@@ -1,0 +1,26 @@
+[default]
+extend-ignore-re = [
+    # Technical terms - OME (Open Microscopy Environment)
+    "OME",
+    "ome",
+    # Technical terms - ND (N-Dimensional)
+    "ND",
+]
+
+[default.extend-words]
+# Allow these specific technical terms
+OME = "OME"
+ome = "ome"
+ND = "ND"
+# NumPy function names
+arange = "arange"
+# Valid variable names
+iy = "iy"
+ix = "ix"
+iz = "iz"
+# File extensions
+PNGs = "PNGs"
+
+[files]
+# Skip checking notebook output cells (they contain ANSI codes that trigger false positives)
+extend-exclude = ["*.ipynb"]

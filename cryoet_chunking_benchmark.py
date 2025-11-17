@@ -4,15 +4,17 @@ CryoET Zarr Chunking Benchmark (Zarr v2 Compatible)
 Test different chunk sizes and their impact on performance and file count
 """
 
-import numpy as np
 import pathlib
 import time
-import pandas as pd
+
 import matplotlib.pyplot as plt
-from cryoet_data_portal import Client, Dataset
+import numpy as np
+import pandas as pd
 import s3fs
 import zarr
+from cryoet_data_portal import Client, Dataset
 from numcodecs import Blosc
+
 from zarr_benchmarks import utils
 
 print("=" * 80)
@@ -42,7 +44,11 @@ zarr_group = zarr.open(store, mode="r")
 zarr_array = zarr_group["0"]
 
 # Download 128³ subset from center
-z_c, y_c, x_c = zarr_array.shape[0] // 2, zarr_array.shape[1] // 2, zarr_array.shape[2] // 2
+z_c, y_c, x_c = (
+    zarr_array.shape[0] // 2,
+    zarr_array.shape[1] // 2,
+    zarr_array.shape[2] // 2,
+)
 size = 128
 
 start_time = time.time()
@@ -110,12 +116,12 @@ def benchmark_chunk_config(name, data, store_path, chunks, compressor):
     # Read - single chunk (to measure chunk read time)
     chunk_size = chunks[0]
     t0 = time.time()
-    single_chunk = zarr_read[0:chunk_size, 0:chunk_size, 0:chunk_size]
+    _ = zarr_read[0:chunk_size, 0:chunk_size, 0:chunk_size]  # Read for timing only
     read_time_chunk = time.time() - t0
 
     # Read - single slice (common operation)
     t0 = time.time()
-    single_slice = zarr_read[data.shape[0] // 2, :, :]
+    _ = zarr_read[data.shape[0] // 2, :, :]  # Read for timing only
     read_time_slice = time.time() - t0
 
     # Verify data integrity
@@ -128,7 +134,9 @@ def benchmark_chunk_config(name, data, store_path, chunks, compressor):
     compression_ratio = data.nbytes / (storage_size * 1024**2)
 
     # Calculate theoretical chunk count
-    theoretical_chunks = np.prod([int(np.ceil(s / c)) for s, c in zip(data.shape, chunks)])
+    theoretical_chunks = np.prod(
+        [int(np.ceil(s / c)) for s, c in zip(data.shape, chunks)]
+    )
 
     return {
         "name": name,
@@ -247,7 +255,7 @@ print("=" * 80)
 
 # File/chunk count analysis
 cubic_data = df[df["name"].str.startswith("chunk_")]
-print(f"\n📁 File Count by Chunk Size (cubic chunks):")
+print("\n📁 File Count by Chunk Size (cubic chunks):")
 for _, row in cubic_data.iterrows():
     print(
         f"   {row['chunks_shape']:8s}: {row['chunk_count']:4.0f} chunks, "
@@ -255,7 +263,7 @@ for _, row in cubic_data.iterrows():
     )
 
 # Find best configurations
-print(f"\n🏆 Best Performers:")
+print("\n🏆 Best Performers:")
 print(f"   Fastest write: {df.loc[df['write_time'].idxmin(), 'name']}")
 print(f"   Fastest full read: {df.loc[df['read_time_full'].idxmin(), 'name']}")
 print(f"   Fastest chunk read: {df.loc[df['read_time_chunk'].idxmin(), 'name']}")
@@ -270,13 +278,19 @@ print(
 )
 
 # Chunk size vs file count trade-off
-print(f"\n📉 Chunk Size Trade-offs:")
+print("\n📉 Chunk Size Trade-offs:")
 smallest_chunk = cubic_data.iloc[0]
 largest_chunk = cubic_data.iloc[-1]
-file_reduction = (1 - largest_chunk["chunk_count"] / smallest_chunk["chunk_count"]) * 100
-read_overhead = (largest_chunk["read_time_chunk"] / smallest_chunk["read_time_chunk"] - 1) * 100
+file_reduction = (
+    1 - largest_chunk["chunk_count"] / smallest_chunk["chunk_count"]
+) * 100
+read_overhead = (
+    largest_chunk["read_time_chunk"] / smallest_chunk["read_time_chunk"] - 1
+) * 100
 
-print(f"   Going from {smallest_chunk['chunks_shape']} to {largest_chunk['chunks_shape']}:")
+print(
+    f"   Going from {smallest_chunk['chunks_shape']} to {largest_chunk['chunks_shape']}:"
+)
 print(f"   - Reduces chunks by {file_reduction:.1f}%")
 print(f"   - Increases single-chunk read time by {read_overhead:.1f}%")
 
@@ -286,7 +300,9 @@ print(f"   - Increases single-chunk read time by {read_overhead:.1f}%")
 print("\n📈 Generating comparison plots...")
 
 fig, axes = plt.subplots(2, 3, figsize=(18, 12))
-fig.suptitle("Zarr Chunking Benchmark - CryoET Data (Zarr v2)", fontsize=16, fontweight="bold")
+fig.suptitle(
+    "Zarr Chunking Benchmark - CryoET Data (Zarr v2)", fontsize=16, fontweight="bold"
+)
 
 # Plot 1: Write Performance vs Chunk Size
 ax = axes[0, 0]
@@ -309,11 +325,21 @@ ax = axes[0, 1]
 x = range(len(cubic_only))
 width = 0.25
 ax.bar(
-    [i - width for i in x], cubic_only["read_time_full"], width, label="Full Read", color="coral"
+    [i - width for i in x],
+    cubic_only["read_time_full"],
+    width,
+    label="Full Read",
+    color="coral",
 )
-ax.bar(x, cubic_only["read_time_chunk"], width, label="Single Chunk", color="lightgreen")
 ax.bar(
-    [i + width for i in x], cubic_only["read_time_slice"], width, label="Single Slice", color="plum"
+    x, cubic_only["read_time_chunk"], width, label="Single Chunk", color="lightgreen"
+)
+ax.bar(
+    [i + width for i in x],
+    cubic_only["read_time_slice"],
+    width,
+    label="Single Slice",
+    color="plum",
 )
 ax.set_xlabel("Chunk Size")
 ax.set_ylabel("Time (s)")
@@ -417,14 +443,16 @@ print("   Result: Faster slice reads, minimal wasted I/O")
 print("\n🎯 For Full Volume Processing:")
 print("   Recommended: Chunk size 128³ (or match processing block size)")
 print("   Why: Minimal chunk overhead, fastest for sequential access")
-print(f"   Result: Fewest files, fastest full reads")
+print("   Result: Fewest files, fastest full reads")
 
 print("\n🎯 For Cloud Storage (S3, GCS, Azure):")
 print("   Recommended: Chunk size 64³ or larger")
 print("   Why: Reduces file count, fewer API calls, lower latency")
 print("   Note: Consider Zarr v3 with sharding for even better performance")
-print(f"   Current: ~{cubic_data[cubic_data['chunk_size'] == 64].iloc[0]['chunk_count']:.0f} files")
-print(f"   With v3 sharding: Could reduce to <10 files (see sharding note below)")
+print(
+    f"   Current: ~{cubic_data[cubic_data['chunk_size'] == 64].iloc[0]['chunk_count']:.0f} files"
+)
+print("   With v3 sharding: Could reduce to <10 files (see sharding note below)")
 
 print("\n🎯 For Random Access (ROI Extraction):")
 print("   Recommended: Chunk size 32³ or 64³")

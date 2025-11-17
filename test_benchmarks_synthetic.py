@@ -8,16 +8,18 @@ Runtime: ~30-60 seconds for full suite
 """
 
 import os
+import pathlib
 import sys
 import time
-import pathlib
+
 import numpy as np
 import pandas as pd
+from skimage.metrics import peak_signal_noise_ratio as psnr
+from skimage.metrics import structural_similarity as ssim
+
 from test_data_generator import generate_synthetic_volume, get_test_dataset_info
-from zarr_benchmarks.read_write_zarr import read_write_zarr
 from zarr_benchmarks import utils
-from skimage.metrics import structural_similarity as ssim, peak_signal_noise_ratio as psnr
-import zarr
+from zarr_benchmarks.read_write_zarr import read_write_zarr
 
 # Enable v3 for testing
 os.environ["ZARR_V3_EXPERIMENTAL_API"] = "1"
@@ -46,7 +48,9 @@ def test_compression_codecs(data: np.ndarray, output_dir: pathlib.Path):
                 compressor = None
             elif "blosc" in codec:
                 cname = codec.split("_")[1]
-                compressor = read_write_zarr.get_blosc_compressor(cname, level, "shuffle")
+                compressor = read_write_zarr.get_blosc_compressor(
+                    cname, level, "shuffle"
+                )
             elif codec == "zstd":
                 compressor = read_write_zarr.get_zstd_compressor(level)
             elif codec == "gzip":
@@ -68,7 +72,7 @@ def test_compression_codecs(data: np.ndarray, output_dir: pathlib.Path):
 
             # Read
             t0 = time.time()
-            read_back = read_write_zarr.read_zarr_array(store_path)
+            _ = read_write_zarr.read_zarr_array(store_path)  # Read for timing only
             read_time = time.time() - t0
 
             # Metrics
@@ -109,7 +113,6 @@ def test_zarr_versions(data: np.ndarray, output_dir: pathlib.Path):
     os.environ["ZARR_V3_EXPERIMENTAL_API"] = "1"
 
     results = []
-    codec = "blosc_zstd"
     level = 5
     chunk_size = 64
 
@@ -136,7 +139,7 @@ def test_zarr_versions(data: np.ndarray, output_dir: pathlib.Path):
 
             # Read
             t0 = time.time()
-            read_back = read_write_zarr.read_zarr_array(store_path)
+            _ = read_write_zarr.read_zarr_array(store_path)  # Read for timing only
             read_time = time.time() - t0
 
             # Metrics
@@ -144,7 +147,9 @@ def test_zarr_versions(data: np.ndarray, output_dir: pathlib.Path):
             ratio = read_write_zarr.get_compression_ratio(store_path)
 
             # Count files
-            file_count = sum(1 for _ in pathlib.Path(store_path).rglob("*") if _.is_file())
+            file_count = sum(
+                1 for _ in pathlib.Path(store_path).rglob("*") if _.is_file()
+            )
 
             results.append(
                 {
@@ -158,11 +163,15 @@ def test_zarr_versions(data: np.ndarray, output_dir: pathlib.Path):
                 }
             )
 
-            print(f"✓ W:{write_time:.3f}s R:{read_time:.3f}s {ratio:.2f}× Files:{file_count}")
+            print(
+                f"✓ W:{write_time:.3f}s R:{read_time:.3f}s {ratio:.2f}× Files:{file_count}"
+            )
 
         except Exception as e:
             print(f"✗ {e}")
-            results.append({"version": f"v{version}", "success": False, "error": str(e)})
+            results.append(
+                {"version": f"v{version}", "success": False, "error": str(e)}
+            )
 
     return pd.DataFrame(results)
 
@@ -175,7 +184,6 @@ def test_chunking_strategies(data: np.ndarray, output_dir: pathlib.Path):
 
     results = []
     chunk_sizes = [32, 64, 128]
-    codec = "blosc_zstd"
     level = 5
 
     for chunk_size in chunk_sizes:
@@ -201,12 +209,14 @@ def test_chunking_strategies(data: np.ndarray, output_dir: pathlib.Path):
 
             # Read
             t0 = time.time()
-            read_back = read_write_zarr.read_zarr_array(store_path)
+            _ = read_write_zarr.read_zarr_array(store_path)  # Read for timing only
             read_time = time.time() - t0
 
             # Metrics
             size_mb = utils.get_directory_size(store_path) / (1024**2)
-            file_count = sum(1 for _ in pathlib.Path(store_path).rglob("*") if _.is_file())
+            file_count = sum(
+                1 for _ in pathlib.Path(store_path).rglob("*") if _.is_file()
+            )
 
             results.append(
                 {
@@ -223,7 +233,9 @@ def test_chunking_strategies(data: np.ndarray, output_dir: pathlib.Path):
 
         except Exception as e:
             print(f"✗ {e}")
-            results.append({"chunk_size": f"{chunk_size}³", "success": False, "error": str(e)})
+            results.append(
+                {"chunk_size": f"{chunk_size}³", "success": False, "error": str(e)}
+            )
 
     return pd.DataFrame(results)
 
@@ -248,7 +260,9 @@ def test_data_integrity(data: np.ndarray, output_dir: pathlib.Path):
         try:
             if "blosc" in codec:
                 cname = codec.split("_")[1]
-                compressor = read_write_zarr.get_blosc_compressor(cname, level, "shuffle")
+                compressor = read_write_zarr.get_blosc_compressor(
+                    cname, level, "shuffle"
+                )
             elif codec == "zstd":
                 compressor = read_write_zarr.get_zstd_compressor(level)
             elif codec == "gzip":
@@ -272,7 +286,9 @@ def test_data_integrity(data: np.ndarray, output_dir: pathlib.Path):
 
             # SSIM on middle slice
             orig_norm = (data - data.min()) / (data.max() - data.min() + 1e-10)
-            read_norm = (read_back - read_back.min()) / (read_back.max() - read_back.min() + 1e-10)
+            read_norm = (read_back - read_back.min()) / (
+                read_back.max() - read_back.min() + 1e-10
+            )
             mid = data.shape[0] // 2
             ssim_val = ssim(orig_norm[mid], read_norm[mid], data_range=1.0)
 
@@ -356,12 +372,12 @@ def main():
     print("=" * 70)
 
     total_tests = sum(len(df) for df in results.values())
-    successful = sum((df["success"] == True).sum() for df in results.values())
+    successful = sum(df["success"].sum() for df in results.values())
     failed = total_tests - successful
 
     print(f"\nTotal runtime: {total_time:.2f}s")
     print(f"Total tests: {total_tests}")
-    print(f"Successful: {successful} ({successful/total_tests*100:.1f}%)")
+    print(f"Successful: {successful} ({successful / total_tests * 100:.1f}%)")
     print(f"Failed: {failed}")
 
     if failed == 0:

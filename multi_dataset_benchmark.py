@@ -9,22 +9,21 @@ import json
 import pathlib
 import time
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import numpy as np
 import pandas as pd
 
+from test_data_generator import generate_synthetic_volume
 from zarr_benchmarks import utils
 from zarr_benchmarks.dataset_types import (
     BenchmarkConfig,
     CompressionProfile,
-    DatasetType,
     create_confocal_metadata,
     create_cryoet_metadata,
     create_lightsheet_metadata,
 )
 from zarr_benchmarks.read_write_zarr import read_write_zarr
-from test_data_generator import generate_synthetic_volume
 
 print("=" * 80)
 print("MULTI-DATASET BENCHMARK ORCHESTRATOR")
@@ -40,14 +39,16 @@ class DatasetBenchmarkRunner:
 
     def run(self, data: np.ndarray) -> Dict[str, Any]:
         """Run benchmarks on dataset"""
-        print(f"\n{'='*80}")
+        print(f"\n{'=' * 80}")
         print(f"Benchmarking: {self.config.dataset_metadata.name}")
         print(f"Type: {self.config.dataset_metadata.dataset_type.value}")
         print(f"Shape: {self.config.dataset_metadata.shape}")
         print(f"Size: {self.config.dataset_metadata.total_size_mb:.2f} MB")
-        print(f"{'='*80}")
+        print(f"{'=' * 80}")
 
-        output_dir = pathlib.Path(self.config.output_dir) / self.config.dataset_metadata.name
+        output_dir = (
+            pathlib.Path(self.config.output_dir) / self.config.dataset_metadata.name
+        )
         output_dir.mkdir(parents=True, exist_ok=True)
 
         all_results = []
@@ -66,9 +67,13 @@ class DatasetBenchmarkRunner:
 
                     # Get compressor
                     if codec == "blosc_zstd":
-                        compressor = read_write_zarr.get_blosc_compressor("zstd", 5, "shuffle")
+                        compressor = read_write_zarr.get_blosc_compressor(
+                            "zstd", 5, "shuffle"
+                        )
                     elif codec == "blosc_lz4":
-                        compressor = read_write_zarr.get_blosc_compressor("lz4", 5, "shuffle")
+                        compressor = read_write_zarr.get_blosc_compressor(
+                            "lz4", 5, "shuffle"
+                        )
                     elif codec == "zstd":
                         compressor = read_write_zarr.get_zstd_compressor(5)
                     elif codec == "gzip":
@@ -117,8 +122,12 @@ class DatasetBenchmarkRunner:
                 avg_results = {
                     "codec": codec,
                     "chunks": str(chunks),
-                    "write_time_avg": np.mean([r["write_time"] for r in results_for_run]),
-                    "write_time_std": np.std([r["write_time"] for r in results_for_run]),
+                    "write_time_avg": np.mean(
+                        [r["write_time"] for r in results_for_run]
+                    ),
+                    "write_time_std": np.std(
+                        [r["write_time"] for r in results_for_run]
+                    ),
                     "read_time_avg": np.mean([r["read_time"] for r in results_for_run]),
                     "read_time_std": np.std([r["read_time"] for r in results_for_run]),
                     "size_mb": results_for_run[0]["size_mb"],
@@ -215,7 +224,10 @@ def run_multi_dataset_benchmark() -> Dict[str, Any]:
     confocal_data = np.random.randint(0, 4095, (3, 3, 32, 512, 512), dtype=np.uint16)
     confocal_config = BenchmarkConfig(
         dataset_metadata=create_confocal_metadata(
-            (3, 3, 32, 512, 512), voxel_size=(0.5, 0.1, 0.1), channels=3, source="synthetic"
+            (3, 3, 32, 512, 512),
+            voxel_size=(0.5, 0.1, 0.1),
+            channels=3,
+            source="synthetic",
         ),
         compression_profile=CompressionProfile.BALANCED,
         codecs_to_test=["blosc_lz4", "blosc_zstd"],
@@ -245,9 +257,9 @@ def run_multi_dataset_benchmark() -> Dict[str, Any]:
     report_path = output_dir / "multi_dataset_report.json"
     with open(report_path, "w") as f:
         json.dump(report, f, indent=2)
-    print(f"\n{'='*80}")
+    print(f"\n{'=' * 80}")
     print(f"✓ Overall report saved to: {report_path}")
-    print(f"{'='*80}")
+    print(f"{'=' * 80}")
 
     return report
 
@@ -268,14 +280,20 @@ if __name__ == "__main__":
         print(f"  Size: {dataset_summary['size_mb']:.2f} MB")
         print(f"  Best write: {dataset_summary['best_write']['codec']}")
         print(f"    - Time: {dataset_summary['best_write']['time_s']:.3f}s")
-        print(f"    - Throughput: {dataset_summary['best_write']['throughput_mbs']:.2f} MB/s")
+        print(
+            f"    - Throughput: {dataset_summary['best_write']['throughput_mbs']:.2f} MB/s"
+        )
         print(f"  Best read: {dataset_summary['best_read']['codec']}")
         print(f"    - Time: {dataset_summary['best_read']['time_s']:.3f}s")
-        print(f"    - Throughput: {dataset_summary['best_read']['throughput_mbs']:.2f} MB/s")
+        print(
+            f"    - Throughput: {dataset_summary['best_read']['throughput_mbs']:.2f} MB/s"
+        )
         print(f"  Best compression: {dataset_summary['best_compression']['codec']}")
         print(f"    - Ratio: {dataset_summary['best_compression']['ratio']:.2f}×")
-        print(f"    - Compressed size: {dataset_summary['best_compression']['size_mb']:.2f} MB")
+        print(
+            f"    - Compressed size: {dataset_summary['best_compression']['size_mb']:.2f} MB"
+        )
 
-    print(f"\n{'='*80}")
+    print(f"\n{'=' * 80}")
     print(f"Total time: {total_time:.2f}s")
-    print(f"{'='*80}")
+    print(f"{'=' * 80}")

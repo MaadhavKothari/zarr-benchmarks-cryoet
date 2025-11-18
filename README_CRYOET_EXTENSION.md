@@ -57,6 +57,7 @@ project with **comprehensive benchmarks on real cryo-electron tomography
    - Compatibility and ecosystem considerations
 
 7. **✅ iohub Format Conversion** 🆕
+
    - TIFF ↔ OME-Zarr conversion benchmarking
    - Multi-format pipeline testing
    - Legacy data migration validation

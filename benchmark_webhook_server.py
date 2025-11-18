@@ -9,7 +9,6 @@ Supports asynchronous processing with job queuing.
 import asyncio
 import json
 import logging
-import pathlib
 import uuid
 from datetime import datetime
 from enum import Enum
@@ -18,17 +17,17 @@ from typing import Any, Dict, Optional
 import numpy as np
 from aiohttp import web
 
+from multi_dataset_benchmark import DatasetBenchmarkRunner
+from test_data_generator import generate_synthetic_volume
 from zarr_benchmarks.dataset_types import (
     BenchmarkConfig,
+    CompressionProfile,
     DatasetMetadata,
     DatasetType,
-    CompressionProfile,
+    create_confocal_metadata,
     create_cryoet_metadata,
     create_lightsheet_metadata,
-    create_confocal_metadata,
 )
-from test_data_generator import generate_synthetic_volume
-from multi_dataset_benchmark import DatasetBenchmarkRunner
 
 # Configure logging
 logging.basicConfig(
@@ -49,7 +48,9 @@ class JobStatus(Enum):
 class BenchmarkJob:
     """Represents a benchmark job"""
 
-    def __init__(self, job_id: str, config: Dict[str, Any], callback_url: Optional[str] = None):
+    def __init__(
+        self, job_id: str, config: Dict[str, Any], callback_url: Optional[str] = None
+    ):
         self.job_id = job_id
         self.config = config
         self.callback_url = callback_url
@@ -67,7 +68,9 @@ class BenchmarkJob:
             "status": self.status.value,
             "created_at": self.created_at.isoformat(),
             "started_at": self.started_at.isoformat() if self.started_at else None,
-            "completed_at": self.completed_at.isoformat() if self.completed_at else None,
+            "completed_at": self.completed_at.isoformat()
+            if self.completed_at
+            else None,
             "results": self.results,
             "error": self.error,
         }
@@ -101,8 +104,12 @@ class BenchmarkWebhookServer:
         await site.start()
 
         logger.info("Webhook server started successfully")
-        logger.info(f"  - Benchmark endpoint: http://{self.host}:{self.port}/webhook/benchmark")
-        logger.info(f"  - Status endpoint: http://{self.host}:{self.port}/status/{{job_id}}")
+        logger.info(
+            f"  - Benchmark endpoint: http://{self.host}:{self.port}/webhook/benchmark"
+        )
+        logger.info(
+            f"  - Status endpoint: http://{self.host}:{self.port}/status/{{job_id}}"
+        )
         logger.info(f"  - Health check: http://{self.host}:{self.port}/health")
 
         # Keep server running
@@ -130,12 +137,18 @@ class BenchmarkWebhookServer:
                 "timestamp": datetime.now().isoformat(),
                 "jobs": {
                     "total": len(self.jobs),
-                    "pending": sum(1 for j in self.jobs.values() if j.status == JobStatus.PENDING),
-                    "running": sum(1 for j in self.jobs.values() if j.status == JobStatus.RUNNING),
+                    "pending": sum(
+                        1 for j in self.jobs.values() if j.status == JobStatus.PENDING
+                    ),
+                    "running": sum(
+                        1 for j in self.jobs.values() if j.status == JobStatus.RUNNING
+                    ),
                     "completed": sum(
                         1 for j in self.jobs.values() if j.status == JobStatus.COMPLETED
                     ),
-                    "failed": sum(1 for j in self.jobs.values() if j.status == JobStatus.FAILED),
+                    "failed": sum(
+                        1 for j in self.jobs.values() if j.status == JobStatus.FAILED
+                    ),
                 },
             }
         )
@@ -174,7 +187,9 @@ class BenchmarkWebhookServer:
             )
 
         except json.JSONDecodeError:
-            return web.json_response({"error": "Invalid JSON in request body"}, status=400)
+            return web.json_response(
+                {"error": "Invalid JSON in request body"}, status=400
+            )
         except Exception as e:
             logger.error(f"Error handling benchmark request: {e}")
             return web.json_response({"error": str(e)}, status=500)
@@ -274,7 +289,9 @@ class BenchmarkWebhookServer:
                 dataset_config.get("voxel_size", [0.5, 0.1, 0.1])[:3]
             )  # ZYX order
             channels = dataset_config.get("channels", 3)
-            metadata = create_confocal_metadata(shape, voxel_size, channels, source="webhook")
+            metadata = create_confocal_metadata(
+                shape, voxel_size, channels, source="webhook"
+            )
         else:
             # Generic custom dataset
             metadata = DatasetMetadata(
@@ -290,7 +307,9 @@ class BenchmarkWebhookServer:
 
         # Generate or load data
         # For now, generate synthetic data (in production, would load from data_url)
-        logger.info(f"Generating synthetic data for {metadata.dataset_type.value} dataset...")
+        logger.info(
+            f"Generating synthetic data for {metadata.dataset_type.value} dataset..."
+        )
         if dataset_type == "cryoet":
             data = generate_synthetic_volume(shape[0], pattern="realistic", seed=42)
         else:
@@ -301,7 +320,9 @@ class BenchmarkWebhookServer:
                 data = np.random.randint(0, 4095, shape, dtype=np.uint16)
 
         # Create benchmark configuration
-        compression_profile_str = benchmark_config.get("compression_profile", "balanced")
+        compression_profile_str = benchmark_config.get(
+            "compression_profile", "balanced"
+        )
         compression_profile = CompressionProfile(compression_profile_str)
 
         codecs_to_test = benchmark_config.get("codecs", ["blosc_zstd", "blosc_lz4"])
@@ -341,7 +362,9 @@ class BenchmarkWebhookServer:
 
             async with aiohttp.ClientSession() as session:
                 async with session.post(
-                    job.callback_url, json=job.to_dict(), timeout=aiohttp.ClientTimeout(total=10)
+                    job.callback_url,
+                    json=job.to_dict(),
+                    timeout=aiohttp.ClientTimeout(total=10),
                 ) as response:
                     if response.status == 200:
                         logger.info(f"Callback sent successfully for job {job.job_id}")

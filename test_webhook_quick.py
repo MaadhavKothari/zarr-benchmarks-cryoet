@@ -2,7 +2,6 @@
 """Quick test of webhook server with a small benchmark"""
 
 import asyncio
-import json
 
 import aiohttp
 
@@ -29,7 +28,9 @@ async def test_small_benchmark():
     async with aiohttp.ClientSession() as session:
         # Submit job
         print("\n→ Submitting benchmark job...")
-        async with session.post("http://127.0.0.1:8080/webhook/benchmark", json=config) as resp:
+        async with session.post(
+            "http://127.0.0.1:8080/webhook/benchmark", json=config
+        ) as resp:
             if resp.status != 202:
                 print(f"❌ Error: Status {resp.status}")
                 print(await resp.text())
@@ -56,9 +57,9 @@ async def test_small_benchmark():
 
                     # Display results
                     results = status.get("results", {})
-                    print(f"\n{'='*60}")
+                    print(f"\n{'=' * 60}")
                     print("RESULTS")
-                    print(f"{'='*60}")
+                    print(f"{'=' * 60}")
 
                     # Print raw results for debugging
                     if isinstance(results, dict):
@@ -68,18 +69,21 @@ async def test_small_benchmark():
                         # Try to display key metrics if available
                         if "summary" in results:
                             summary = results["summary"]
-                            print(f"\nSummary:")
+                            print("\nSummary:")
                             print(f"  Best Write: {summary.get('best_write', 'N/A')}")
                             print(f"  Best Read: {summary.get('best_read', 'N/A')}")
-                            print(f"  Best Compression: {summary.get('best_compression', 'N/A')}")
+                            print(
+                                f"  Best Compression: {summary.get('best_compression', 'N/A')}"
+                            )
                         else:
                             print("\nRaw results:")
                             import json
+
                             print(json.dumps(results, indent=2, default=str))
                     else:
                         print(f"Results: {results}")
 
-                    print(f"{'='*60}")
+                    print(f"{'=' * 60}")
                     return True
 
                 elif status["status"] == "failed":

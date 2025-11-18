@@ -80,7 +80,9 @@ class DatasetMetadata:
         return self.total_size_bytes / (1024**3)
 
     def suggest_chunk_size(
-        self, target_mb: float = 64.0, compression_profile: CompressionProfile = CompressionProfile.BALANCED
+        self,
+        target_mb: float = 64.0,
+        compression_profile: CompressionProfile = CompressionProfile.BALANCED,
     ) -> Tuple[int, ...]:
         """
         Suggest optimal chunk size based on dataset characteristics
@@ -161,7 +163,10 @@ class BenchmarkConfig:
             self.chunk_sizes_to_test = [
                 tuple(c // 2 for c in base_chunks),  # Smaller
                 base_chunks,  # Recommended
-                tuple(min(c * 2, s) for c, s in zip(base_chunks, self.dataset_metadata.shape)),  # Larger
+                tuple(
+                    min(c * 2, s)
+                    for c, s in zip(base_chunks, self.dataset_metadata.shape)
+                ),  # Larger
             ]
 
 

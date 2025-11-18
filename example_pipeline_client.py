@@ -7,7 +7,6 @@ Shows how to submit jobs, poll for status, and retrieve results.
 """
 
 import asyncio
-import json
 import time
 from typing import Any, Dict, Optional
 
@@ -49,7 +48,10 @@ class BenchmarkClient:
         Returns:
             Job information including job_id and status_url
         """
-        payload = {"dataset": config["dataset"], "benchmark": config.get("benchmark", {})}
+        payload = {
+            "dataset": config["dataset"],
+            "benchmark": config.get("benchmark", {}),
+        }
 
         if callback_url:
             payload["callback_url"] = callback_url
@@ -92,7 +94,9 @@ class BenchmarkClient:
             if status["status"] == "completed":
                 return status
             elif status["status"] == "failed":
-                raise RuntimeError(f"Job failed: {status.get('error', 'Unknown error')}")
+                raise RuntimeError(
+                    f"Job failed: {status.get('error', 'Unknown error')}"
+                )
 
             await asyncio.sleep(poll_interval)
 
@@ -154,10 +158,14 @@ async def example_cryoet_benchmark():
             print("\nBest Performance:")
             print(f"  Write: {dataset['best_write']['codec']}")
             print(f"    - Time: {dataset['best_write']['time_s']:.3f}s")
-            print(f"    - Throughput: {dataset['best_write']['throughput_mbs']:.2f} MB/s")
+            print(
+                f"    - Throughput: {dataset['best_write']['throughput_mbs']:.2f} MB/s"
+            )
             print(f"  Read: {dataset['best_read']['codec']}")
             print(f"    - Time: {dataset['best_read']['time_s']:.3f}s")
-            print(f"    - Throughput: {dataset['best_read']['throughput_mbs']:.2f} MB/s")
+            print(
+                f"    - Throughput: {dataset['best_read']['throughput_mbs']:.2f} MB/s"
+            )
             print(f"  Compression: {dataset['best_compression']['codec']}")
             print(f"    - Ratio: {dataset['best_compression']['ratio']:.2f}×")
             print(f"    - Size: {dataset['best_compression']['size_mb']:.2f} MB")
@@ -233,7 +241,7 @@ async def example_batch_benchmarks():
         for i, config in enumerate(configs):
             job_info = await client.submit_benchmark(config)
             job_ids.append(job_info["job_id"])
-            print(f"  ✓ Job {i+1} submitted: {job_info['job_id']}")
+            print(f"  ✓ Job {i + 1} submitted: {job_info['job_id']}")
 
         # Wait for all to complete
         print(f"\n→ Waiting for {len(job_ids)} jobs to complete...")
@@ -244,7 +252,7 @@ async def example_batch_benchmarks():
         print("\n✓ All jobs completed!")
         for i, result in enumerate(results):
             dataset = result["results"]["dataset"]
-            print(f"\n  Job {i+1}: {dataset['dataset']}")
+            print(f"\n  Job {i + 1}: {dataset['dataset']}")
             print(f"    Best codec: {dataset['best_compression']['codec']}")
             print(f"    Compression: {dataset['best_compression']['ratio']:.2f}×")
 

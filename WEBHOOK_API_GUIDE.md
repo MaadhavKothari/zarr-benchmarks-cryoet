@@ -52,6 +52,7 @@ curl -X POST http://localhost:8080/benchmark \
 ```
 
 **Response:**
+
 ```json
 {
   "job_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
@@ -67,6 +68,7 @@ curl http://localhost:8080/status/a1b2c3d4-e5f6-7890-1234-567890abcdef
 ```
 
 **Response (running):**
+
 ```json
 {
   "job_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
@@ -77,6 +79,7 @@ curl http://localhost:8080/status/a1b2c3d4-e5f6-7890-1234-567890abcdef
 ```
 
 **Response (completed):**
+
 ```json
 {
   "job_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
@@ -112,18 +115,20 @@ curl http://localhost:8080/status/a1b2c3d4-e5f6-7890-1234-567890abcdef
 Submit a new benchmark job.
 
 **Request Body:**
+
 ```json
 {
-  "dataset_type": "cryoet",           // Required: Dataset type
-  "shape": [256, 256, 256],           // Required: Volume dimensions
-  "voxel_size": [2.5, 2.5, 2.5],     // Optional: Physical voxel size (nm)
-  "compression_profile": "balanced",  // Optional: archival|balanced|fast|lossless
-  "custom_codecs": ["blosc_zstd"],   // Optional: Specific codecs to test
-  "chunk_sizes": [[64,64,64]]        // Optional: Custom chunk sizes
+  "dataset_type": "cryoet", // Required: Dataset type
+  "shape": [256, 256, 256], // Required: Volume dimensions
+  "voxel_size": [2.5, 2.5, 2.5], // Optional: Physical voxel size (nm)
+  "compression_profile": "balanced", // Optional: archival|balanced|fast|lossless
+  "custom_codecs": ["blosc_zstd"], // Optional: Specific codecs to test
+  "chunk_sizes": [[64, 64, 64]] // Optional: Custom chunk sizes
 }
 ```
 
 **Response:** `201 Created`
+
 ```json
 {
   "job_id": "uuid",
@@ -139,6 +144,7 @@ Submit a new benchmark job.
 Check status of a benchmark job.
 
 **Response:** `200 OK`
+
 ```json
 {
   "job_id": "uuid",
@@ -146,7 +152,9 @@ Check status of a benchmark job.
   "submitted_at": "ISO-8601 timestamp",
   "started_at": "ISO-8601 timestamp or null",
   "completed_at": "ISO-8601 timestamp or null",
-  "results": { /* benchmark results if completed */ },
+  "results": {
+    /* benchmark results if completed */
+  },
   "error": "error message if failed"
 }
 ```
@@ -158,6 +166,7 @@ Check status of a benchmark job.
 Check server health.
 
 **Response:** `200 OK`
+
 ```json
 {
   "status": "healthy",
@@ -441,6 +450,7 @@ WantedBy=multi-user.target
 ```
 
 Enable and start:
+
 ```bash
 sudo systemctl enable zarr-benchmark-server
 sudo systemctl start zarr-benchmark-server
@@ -465,6 +475,7 @@ CMD ["python", "benchmark_webhook_server.py"]
 ```
 
 Build and run:
+
 ```bash
 docker build -t zarr-benchmark-server .
 docker run -d -p 8080:8080 --name benchmark-server zarr-benchmark-server
@@ -648,4 +659,5 @@ async def get_metrics(request):
 ---
 
 **Version History:**
+
 - v1.0.0 (2025-11-18): Initial webhook server release

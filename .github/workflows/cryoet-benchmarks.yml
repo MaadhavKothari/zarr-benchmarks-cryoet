@@ -42,6 +42,7 @@ jobs:
           python test_benchmarks_synthetic.py
         env:
           PYTHONUNBUFFERED: 1
+          ZARR_V3_EXPERIMENTAL_API: 1
 
       - name: Upload synthetic test results
         uses: actions/upload-artifact@v4

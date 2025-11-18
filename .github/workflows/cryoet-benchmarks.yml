@@ -45,7 +45,7 @@ jobs:
           ZARR_V3_EXPERIMENTAL_API: 1
 
       - name: Upload synthetic test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: synthetic-test-results
@@ -110,7 +110,7 @@ jobs:
           PYTHONUNBUFFERED: 1
 
       - name: Upload benchmark results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: quick-benchmark-results
           path: |
@@ -152,7 +152,7 @@ jobs:
           PYTHONUNBUFFERED: 1
 
       - name: Upload chunking results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: chunking-benchmark-results
           path: |

@@ -2,18 +2,18 @@ name: CryoET Benchmarks CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
     paths:
-      - 'cryoet_*.py'
-      - 'tests/**'
-      - 'src/zarr_benchmarks/**'
-      - '.github/workflows/cryoet-benchmarks.yml'
+      - "cryoet_*.py"
+      - "tests/**"
+      - "src/zarr_benchmarks/**"
+      - ".github/workflows/cryoet-benchmarks.yml"
   pull_request:
-    branches: [ main ]
+    branches: [main]
   schedule:
     # Run weekly on Sundays at 00:00 UTC
-    - cron: '0 0 * * 0'
-  workflow_dispatch:  # Manual trigger
+    - cron: "0 0 * * 0"
+  workflow_dispatch: # Manual trigger
 
 jobs:
   synthetic-tests:
@@ -28,8 +28,8 @@ jobs:
       - name: Setup Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
-          cache: 'pip'
+          python-version: "3.13"
+          cache: "pip"
 
       - name: Install dependencies
         run: |
@@ -65,8 +65,8 @@ jobs:
       - name: Setup Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
-          cache: 'pip'
+          python-version: "3.13"
+          cache: "pip"
 
       - name: Install dependencies
         run: |
@@ -93,8 +93,8 @@ jobs:
       - name: Setup Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
-          cache: 'pip'
+          python-version: "3.13"
+          cache: "pip"
 
       - name: Install dependencies
         run: |
@@ -124,7 +124,9 @@ jobs:
     timeout-minutes: 20
     needs: test-connection
     # Only run on main branch or manual trigger to save resources
-    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    if:
+      github.ref == 'refs/heads/main' || github.event_name ==
+      'workflow_dispatch'
 
     steps:
       - name: Checkout code
@@ -133,8 +135,8 @@ jobs:
       - name: Setup Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
-          cache: 'pip'
+          python-version: "3.13"
+          cache: "pip"
 
       - name: Install dependencies
         run: |
@@ -168,7 +170,7 @@ jobs:
       - name: Setup Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: "3.13"
 
       - name: Install tools
         run: |
@@ -202,8 +204,8 @@ jobs:
       - name: Setup Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
-          cache: 'pip'
+          python-version: "3.13"
+          cache: "pip"
 
       - name: Install dependencies
         run: |
@@ -245,7 +247,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: "3.13"
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4

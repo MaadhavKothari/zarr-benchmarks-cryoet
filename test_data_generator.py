@@ -5,8 +5,9 @@ Generates various types of synthetic 3D volumes for testing benchmarking pipelin
 without requiring large downloads or specific datasets.
 """
 
+from typing import Literal
+
 import numpy as np
-from typing import Tuple, Literal
 
 
 def generate_synthetic_volume(
@@ -62,7 +63,9 @@ def generate_synthetic_volume(
             radius = np.random.randint(size // 8, size // 4)
             intensity = np.random.rand() * 10
 
-            dist = np.sqrt((z - center_z) ** 2 + (y - center_y) ** 2 + (x - center_x) ** 2)
+            dist = np.sqrt(
+                (z - center_z) ** 2 + (y - center_y) ** 2 + (x - center_x) ** 2
+            )
             sphere = intensity * np.exp(-(dist**2) / (2 * (radius / 2) ** 2))
             data += sphere
 
@@ -82,7 +85,9 @@ def generate_synthetic_volume(
             radius = np.random.randint(size // 12, size // 6)
             intensity = np.random.rand() * 2 + 1
 
-            dist = np.sqrt((z - center_z) ** 2 + (y - center_y) ** 2 + (x - center_x) ** 2)
+            dist = np.sqrt(
+                (z - center_z) ** 2 + (y - center_y) ** 2 + (x - center_x) ** 2
+            )
             sphere = intensity * np.exp(-(dist**2) / (2 * (radius / 2) ** 2))
             data += sphere
 

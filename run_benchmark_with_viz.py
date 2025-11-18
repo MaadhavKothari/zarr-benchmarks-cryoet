@@ -4,13 +4,15 @@ Zarr Benchmarks Demo with Data Visualization
 This script visualizes the sample data BEFORE running benchmarks.
 """
 
-import numpy as np
 import pathlib
 import time
-import pandas as pd
+
 import matplotlib.pyplot as plt
-from zarr_benchmarks.read_write_zarr import read_write_zarr
+import numpy as np
+import pandas as pd
+
 from zarr_benchmarks import utils
+from zarr_benchmarks.read_write_zarr import read_write_zarr
 
 print("=" * 70)
 print("ZARR BENCHMARKS DEMO WITH DATA VISUALIZATION")
@@ -43,30 +45,30 @@ fig = plt.figure(figsize=(16, 12))
 # Row 3: YZ plane at different X positions
 
 # XY slices (looking down through Z)
-for i, z_pos in enumerate([image_size//4, image_size//2, 3*image_size//4]):
-    ax = plt.subplot(3, 3, i+1)
-    im = ax.imshow(sample_image[z_pos, :, :], cmap='viridis', aspect='auto')
-    ax.set_title(f'XY Slice (Z={z_pos})')
-    ax.set_xlabel('X')
-    ax.set_ylabel('Y')
+for i, z_pos in enumerate([image_size // 4, image_size // 2, 3 * image_size // 4]):
+    ax = plt.subplot(3, 3, i + 1)
+    im = ax.imshow(sample_image[z_pos, :, :], cmap="viridis", aspect="auto")
+    ax.set_title(f"XY Slice (Z={z_pos})")
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
     plt.colorbar(im, ax=ax, fraction=0.046)
 
 # XZ slices (looking from the side, Y direction)
-for i, y_pos in enumerate([image_size//4, image_size//2, 3*image_size//4]):
-    ax = plt.subplot(3, 3, i+4)
-    im = ax.imshow(sample_image[:, y_pos, :], cmap='plasma', aspect='auto')
-    ax.set_title(f'XZ Slice (Y={y_pos})')
-    ax.set_xlabel('X')
-    ax.set_ylabel('Z')
+for i, y_pos in enumerate([image_size // 4, image_size // 2, 3 * image_size // 4]):
+    ax = plt.subplot(3, 3, i + 4)
+    im = ax.imshow(sample_image[:, y_pos, :], cmap="plasma", aspect="auto")
+    ax.set_title(f"XZ Slice (Y={y_pos})")
+    ax.set_xlabel("X")
+    ax.set_ylabel("Z")
     plt.colorbar(im, ax=ax, fraction=0.046)
 
 # YZ slices (looking from the side, X direction)
-for i, x_pos in enumerate([image_size//4, image_size//2, 3*image_size//4]):
-    ax = plt.subplot(3, 3, i+7)
-    im = ax.imshow(sample_image[:, :, x_pos], cmap='inferno', aspect='auto')
-    ax.set_title(f'YZ Slice (X={x_pos})')
-    ax.set_xlabel('Y')
-    ax.set_ylabel('Z')
+for i, x_pos in enumerate([image_size // 4, image_size // 2, 3 * image_size // 4]):
+    ax = plt.subplot(3, 3, i + 7)
+    im = ax.imshow(sample_image[:, :, x_pos], cmap="inferno", aspect="auto")
+    ax.set_title(f"YZ Slice (X={x_pos})")
+    ax.set_xlabel("Y")
+    ax.set_ylabel("Z")
     plt.colorbar(im, ax=ax, fraction=0.046)
 
 plt.tight_layout()
@@ -75,7 +77,7 @@ plt.tight_layout()
 viz_dir = pathlib.Path("data/output/visualizations")
 viz_dir.mkdir(parents=True, exist_ok=True)
 viz_path = viz_dir / "sample_data_slices.png"
-plt.savefig(viz_path, dpi=150, bbox_inches='tight')
+plt.savefig(viz_path, dpi=150, bbox_inches="tight")
 print(f"   ✓ Data visualization saved to: {viz_path}")
 plt.show()
 
@@ -87,26 +89,28 @@ print("\n📊 3. Analyzing data distribution...")
 fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 
 # Histogram
-axes[0].hist(sample_image.flatten(), bins=50, color='steelblue', alpha=0.7, edgecolor='black')
-axes[0].set_xlabel('Pixel Value')
-axes[0].set_ylabel('Frequency')
-axes[0].set_title('Distribution of Pixel Values')
+axes[0].hist(
+    sample_image.flatten(), bins=50, color="steelblue", alpha=0.7, edgecolor="black"
+)
+axes[0].set_xlabel("Pixel Value")
+axes[0].set_ylabel("Frequency")
+axes[0].set_title("Distribution of Pixel Values")
 axes[0].grid(True, alpha=0.3)
 
 # Statistics box plot
 sample_slices = [
-    sample_image[image_size//4, :, :].flatten(),
-    sample_image[image_size//2, :, :].flatten(),
-    sample_image[3*image_size//4, :, :].flatten()
+    sample_image[image_size // 4, :, :].flatten(),
+    sample_image[image_size // 2, :, :].flatten(),
+    sample_image[3 * image_size // 4, :, :].flatten(),
 ]
-axes[1].boxplot(sample_slices, labels=['Z=64', 'Z=128', 'Z=192'])
-axes[1].set_ylabel('Pixel Value')
-axes[1].set_title('Distribution Across Different Z Slices')
+axes[1].boxplot(sample_slices, labels=["Z=64", "Z=128", "Z=192"])
+axes[1].set_ylabel("Pixel Value")
+axes[1].set_title("Distribution Across Different Z Slices")
 axes[1].grid(True, alpha=0.3)
 
 plt.tight_layout()
 hist_path = viz_dir / "data_distribution.png"
-plt.savefig(hist_path, dpi=150, bbox_inches='tight')
+plt.savefig(hist_path, dpi=150, bbox_inches="tight")
 print(f"   ✓ Distribution analysis saved to: {hist_path}")
 plt.show()
 
@@ -117,21 +121,23 @@ print("\n🔍 4. Data statistics by region...")
 
 # Analyze different regions
 regions = {
-    'Top Quarter': sample_image[:image_size//4, :, :],
-    'Middle Half': sample_image[image_size//4:3*image_size//4, :, :],
-    'Bottom Quarter': sample_image[3*image_size//4:, :, :],
+    "Top Quarter": sample_image[: image_size // 4, :, :],
+    "Middle Half": sample_image[image_size // 4 : 3 * image_size // 4, :, :],
+    "Bottom Quarter": sample_image[3 * image_size // 4 :, :, :],
 }
 
 stats_data = []
 for region_name, region_data in regions.items():
-    stats_data.append({
-        'Region': region_name,
-        'Mean': region_data.mean(),
-        'Std': region_data.std(),
-        'Min': region_data.min(),
-        'Max': region_data.max(),
-        'Size (MB)': region_data.nbytes / (1024**2)
-    })
+    stats_data.append(
+        {
+            "Region": region_name,
+            "Mean": region_data.mean(),
+            "Std": region_data.std(),
+            "Min": region_data.min(),
+            "Max": region_data.max(),
+            "Size (MB)": region_data.nbytes / (1024**2),
+        }
+    )
 
 stats_df = pd.DataFrame(stats_data)
 print("\n" + stats_df.to_string(index=False))
@@ -160,13 +166,19 @@ print(f"   Zarr spec: v{zarr_spec}")
 # 6. RUN BENCHMARKS
 # ============================================================================
 compression_methods = [
-    ('blosc', 'Blosc-Zstd', lambda: read_write_zarr.get_blosc_compressor("zstd", 5, "shuffle", zarr_spec)),
-    ('gzip', 'GZip', lambda: read_write_zarr.get_gzip_compressor(6, zarr_spec)),
-    ('zstd', 'Zstd', lambda: read_write_zarr.get_zstd_compressor(5, zarr_spec)),
-    ('no_compression', 'No Compression', lambda: None),
+    (
+        "blosc",
+        "Blosc-Zstd",
+        lambda: read_write_zarr.get_blosc_compressor("zstd", 5, "shuffle", zarr_spec),
+    ),
+    ("gzip", "GZip", lambda: read_write_zarr.get_gzip_compressor(6, zarr_spec)),
+    ("zstd", "Zstd", lambda: read_write_zarr.get_zstd_compressor(5, zarr_spec)),
+    ("no_compression", "No Compression", lambda: None),
 ]
 
-for idx, (method_key, method_name, get_compressor) in enumerate(compression_methods, start=6):
+for idx, (method_key, method_name, get_compressor) in enumerate(
+    compression_methods, start=6
+):
     print(f"\n🔧 {idx}. Testing {method_name}...")
     store_path = output_dir / f"{method_key}.zarr"
     compressor = get_compressor()
@@ -179,7 +191,7 @@ for idx, (method_key, method_name, get_compressor) in enumerate(compression_meth
         overwrite=False,
         chunks=chunks,
         compressor=compressor,
-        zarr_spec=zarr_spec
+        zarr_spec=zarr_spec,
     )
     write_time = time.time() - start_time
 
@@ -191,10 +203,10 @@ for idx, (method_key, method_name, get_compressor) in enumerate(compression_meth
     storage_size = utils.get_directory_size(store_path) / (1024**2)
 
     results[method_key] = {
-        'write_time': write_time,
-        'read_time': read_time,
-        'compression_ratio': compression_ratio,
-        'storage_size_mb': storage_size
+        "write_time": write_time,
+        "read_time": read_time,
+        "compression_ratio": compression_ratio,
+        "storage_size_mb": storage_size,
     }
 
     print(f"   ✓ Write time: {write_time:.3f}s")
@@ -212,7 +224,12 @@ print("=" * 70)
 
 summary_df = pd.DataFrame(results).T
 summary_df = summary_df.round(3)
-summary_df.columns = ['Write Time (s)', 'Read Time (s)', 'Compression Ratio', 'Storage Size (MB)']
+summary_df.columns = [
+    "Write Time (s)",
+    "Read Time (s)",
+    "Compression Ratio",
+    "Storage Size (MB)",
+]
 
 print("\n" + summary_df.to_string())
 
@@ -230,40 +247,40 @@ print("\n📊 Generating comparison plots...")
 fig, axes = plt.subplots(2, 2, figsize=(14, 10))
 
 methods = list(results.keys())
-write_times = [results[m]['write_time'] for m in methods]
-read_times = [results[m]['read_time'] for m in methods]
-compression_ratios = [results[m]['compression_ratio'] for m in methods]
-storage_sizes = [results[m]['storage_size_mb'] for m in methods]
+write_times = [results[m]["write_time"] for m in methods]
+read_times = [results[m]["read_time"] for m in methods]
+compression_ratios = [results[m]["compression_ratio"] for m in methods]
+storage_sizes = [results[m]["storage_size_mb"] for m in methods]
 
 # Plot 1: Write times
-axes[0, 0].bar(methods, write_times, color='steelblue')
-axes[0, 0].set_ylabel('Time (seconds)')
-axes[0, 0].set_title('Write Performance')
-axes[0, 0].tick_params(axis='x', rotation=45)
+axes[0, 0].bar(methods, write_times, color="steelblue")
+axes[0, 0].set_ylabel("Time (seconds)")
+axes[0, 0].set_title("Write Performance")
+axes[0, 0].tick_params(axis="x", rotation=45)
 
 # Plot 2: Read times
-axes[0, 1].bar(methods, read_times, color='coral')
-axes[0, 1].set_ylabel('Time (seconds)')
-axes[0, 1].set_title('Read Performance')
-axes[0, 1].tick_params(axis='x', rotation=45)
+axes[0, 1].bar(methods, read_times, color="coral")
+axes[0, 1].set_ylabel("Time (seconds)")
+axes[0, 1].set_title("Read Performance")
+axes[0, 1].tick_params(axis="x", rotation=45)
 
 # Plot 3: Compression ratios
-axes[1, 0].bar(methods, compression_ratios, color='green')
-axes[1, 0].set_ylabel('Compression Ratio')
-axes[1, 0].set_title('Compression Ratio (Higher is Better)')
-axes[1, 0].tick_params(axis='x', rotation=45)
+axes[1, 0].bar(methods, compression_ratios, color="green")
+axes[1, 0].set_ylabel("Compression Ratio")
+axes[1, 0].set_title("Compression Ratio (Higher is Better)")
+axes[1, 0].tick_params(axis="x", rotation=45)
 
 # Plot 4: Storage sizes
-axes[1, 1].bar(methods, storage_sizes, color='purple')
-axes[1, 1].set_ylabel('Size (MB)')
-axes[1, 1].set_title('Storage Size (Lower is Better)')
-axes[1, 1].tick_params(axis='x', rotation=45)
+axes[1, 1].bar(methods, storage_sizes, color="purple")
+axes[1, 1].set_ylabel("Size (MB)")
+axes[1, 1].set_title("Storage Size (Lower is Better)")
+axes[1, 1].tick_params(axis="x", rotation=45)
 
 plt.tight_layout()
 
 # Save the plot
 plot_path = output_dir / "benchmark_comparison.png"
-plt.savefig(plot_path, dpi=150, bbox_inches='tight')
+plt.savefig(plot_path, dpi=150, bbox_inches="tight")
 print(f"   ✓ Plot saved to: {plot_path}")
 
 # Show the plot

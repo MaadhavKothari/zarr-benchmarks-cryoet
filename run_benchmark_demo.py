@@ -4,13 +4,15 @@ Standalone Zarr Benchmarks Demo Script
 This script runs all the benchmarks from the notebook in a simple Python script.
 """
 
-import numpy as np
 import pathlib
 import time
-import pandas as pd
+
 import matplotlib.pyplot as plt
-from zarr_benchmarks.read_write_zarr import read_write_zarr
+import numpy as np
+import pandas as pd
+
 from zarr_benchmarks import utils
+from zarr_benchmarks.read_write_zarr import read_write_zarr
 
 print("=" * 70)
 print("ZARR BENCHMARKS DEMO")
@@ -48,10 +50,7 @@ print(f"   Zarr spec: v{zarr_spec}")
 print("\n🔧 3. Testing Blosc Compression...")
 store_path = output_dir / "blosc_compressed.zarr"
 blosc_compressor = read_write_zarr.get_blosc_compressor(
-    cname="zstd",
-    clevel=5,
-    shuffle="shuffle",
-    zarr_spec=zarr_spec
+    cname="zstd", clevel=5, shuffle="shuffle", zarr_spec=zarr_spec
 )
 
 utils.remove_output_dir(store_path)
@@ -62,7 +61,7 @@ read_write_zarr.write_zarr_array(
     overwrite=False,
     chunks=chunks,
     compressor=blosc_compressor,
-    zarr_spec=zarr_spec
+    zarr_spec=zarr_spec,
 )
 write_time = time.time() - start_time
 
@@ -73,11 +72,11 @@ read_time = time.time() - start_time
 compression_ratio = read_write_zarr.get_compression_ratio(store_path)
 storage_size = utils.get_directory_size(store_path) / (1024**2)
 
-results['blosc'] = {
-    'write_time': write_time,
-    'read_time': read_time,
-    'compression_ratio': compression_ratio,
-    'storage_size_mb': storage_size
+results["blosc"] = {
+    "write_time": write_time,
+    "read_time": read_time,
+    "compression_ratio": compression_ratio,
+    "storage_size_mb": storage_size,
 }
 
 print(f"   ✓ Write time: {write_time:.3f}s")
@@ -91,10 +90,7 @@ print(f"   ✓ Data integrity: {np.allclose(sample_image, read_image)}")
 # ============================================================================
 print("\n🔧 4. Testing GZip Compression...")
 store_path = output_dir / "gzip_compressed.zarr"
-gzip_compressor = read_write_zarr.get_gzip_compressor(
-    level=6,
-    zarr_spec=zarr_spec
-)
+gzip_compressor = read_write_zarr.get_gzip_compressor(level=6, zarr_spec=zarr_spec)
 
 utils.remove_output_dir(store_path)
 start_time = time.time()
@@ -104,7 +100,7 @@ read_write_zarr.write_zarr_array(
     overwrite=False,
     chunks=chunks,
     compressor=gzip_compressor,
-    zarr_spec=zarr_spec
+    zarr_spec=zarr_spec,
 )
 write_time = time.time() - start_time
 
@@ -115,11 +111,11 @@ read_time = time.time() - start_time
 compression_ratio = read_write_zarr.get_compression_ratio(store_path)
 storage_size = utils.get_directory_size(store_path) / (1024**2)
 
-results['gzip'] = {
-    'write_time': write_time,
-    'read_time': read_time,
-    'compression_ratio': compression_ratio,
-    'storage_size_mb': storage_size
+results["gzip"] = {
+    "write_time": write_time,
+    "read_time": read_time,
+    "compression_ratio": compression_ratio,
+    "storage_size_mb": storage_size,
 }
 
 print(f"   ✓ Write time: {write_time:.3f}s")
@@ -133,10 +129,7 @@ print(f"   ✓ Data integrity: {np.allclose(sample_image, read_image)}")
 # ============================================================================
 print("\n🔧 5. Testing Zstd Compression...")
 store_path = output_dir / "zstd_compressed.zarr"
-zstd_compressor = read_write_zarr.get_zstd_compressor(
-    level=5,
-    zarr_spec=zarr_spec
-)
+zstd_compressor = read_write_zarr.get_zstd_compressor(level=5, zarr_spec=zarr_spec)
 
 utils.remove_output_dir(store_path)
 start_time = time.time()
@@ -146,7 +139,7 @@ read_write_zarr.write_zarr_array(
     overwrite=False,
     chunks=chunks,
     compressor=zstd_compressor,
-    zarr_spec=zarr_spec
+    zarr_spec=zarr_spec,
 )
 write_time = time.time() - start_time
 
@@ -157,11 +150,11 @@ read_time = time.time() - start_time
 compression_ratio = read_write_zarr.get_compression_ratio(store_path)
 storage_size = utils.get_directory_size(store_path) / (1024**2)
 
-results['zstd'] = {
-    'write_time': write_time,
-    'read_time': read_time,
-    'compression_ratio': compression_ratio,
-    'storage_size_mb': storage_size
+results["zstd"] = {
+    "write_time": write_time,
+    "read_time": read_time,
+    "compression_ratio": compression_ratio,
+    "storage_size_mb": storage_size,
 }
 
 print(f"   ✓ Write time: {write_time:.3f}s")
@@ -184,7 +177,7 @@ read_write_zarr.write_zarr_array(
     overwrite=False,
     chunks=chunks,
     compressor=None,
-    zarr_spec=zarr_spec
+    zarr_spec=zarr_spec,
 )
 write_time = time.time() - start_time
 
@@ -195,11 +188,11 @@ read_time = time.time() - start_time
 compression_ratio = read_write_zarr.get_compression_ratio(store_path)
 storage_size = utils.get_directory_size(store_path) / (1024**2)
 
-results['no_compression'] = {
-    'write_time': write_time,
-    'read_time': read_time,
-    'compression_ratio': compression_ratio,
-    'storage_size_mb': storage_size
+results["no_compression"] = {
+    "write_time": write_time,
+    "read_time": read_time,
+    "compression_ratio": compression_ratio,
+    "storage_size_mb": storage_size,
 }
 
 print(f"   ✓ Write time: {write_time:.3f}s")
@@ -217,7 +210,12 @@ print("=" * 70)
 
 summary_df = pd.DataFrame(results).T
 summary_df = summary_df.round(3)
-summary_df.columns = ['Write Time (s)', 'Read Time (s)', 'Compression Ratio', 'Storage Size (MB)']
+summary_df.columns = [
+    "Write Time (s)",
+    "Read Time (s)",
+    "Compression Ratio",
+    "Storage Size (MB)",
+]
 
 print("\n" + summary_df.to_string())
 
@@ -235,40 +233,40 @@ print("\n📊 Generating comparison plots...")
 fig, axes = plt.subplots(2, 2, figsize=(14, 10))
 
 methods = list(results.keys())
-write_times = [results[m]['write_time'] for m in methods]
-read_times = [results[m]['read_time'] for m in methods]
-compression_ratios = [results[m]['compression_ratio'] for m in methods]
-storage_sizes = [results[m]['storage_size_mb'] for m in methods]
+write_times = [results[m]["write_time"] for m in methods]
+read_times = [results[m]["read_time"] for m in methods]
+compression_ratios = [results[m]["compression_ratio"] for m in methods]
+storage_sizes = [results[m]["storage_size_mb"] for m in methods]
 
 # Plot 1: Write times
-axes[0, 0].bar(methods, write_times, color='steelblue')
-axes[0, 0].set_ylabel('Time (seconds)')
-axes[0, 0].set_title('Write Performance')
-axes[0, 0].tick_params(axis='x', rotation=45)
+axes[0, 0].bar(methods, write_times, color="steelblue")
+axes[0, 0].set_ylabel("Time (seconds)")
+axes[0, 0].set_title("Write Performance")
+axes[0, 0].tick_params(axis="x", rotation=45)
 
 # Plot 2: Read times
-axes[0, 1].bar(methods, read_times, color='coral')
-axes[0, 1].set_ylabel('Time (seconds)')
-axes[0, 1].set_title('Read Performance')
-axes[0, 1].tick_params(axis='x', rotation=45)
+axes[0, 1].bar(methods, read_times, color="coral")
+axes[0, 1].set_ylabel("Time (seconds)")
+axes[0, 1].set_title("Read Performance")
+axes[0, 1].tick_params(axis="x", rotation=45)
 
 # Plot 3: Compression ratios
-axes[1, 0].bar(methods, compression_ratios, color='green')
-axes[1, 0].set_ylabel('Compression Ratio')
-axes[1, 0].set_title('Compression Ratio (Higher is Better)')
-axes[1, 0].tick_params(axis='x', rotation=45)
+axes[1, 0].bar(methods, compression_ratios, color="green")
+axes[1, 0].set_ylabel("Compression Ratio")
+axes[1, 0].set_title("Compression Ratio (Higher is Better)")
+axes[1, 0].tick_params(axis="x", rotation=45)
 
 # Plot 4: Storage sizes
-axes[1, 1].bar(methods, storage_sizes, color='purple')
-axes[1, 1].set_ylabel('Size (MB)')
-axes[1, 1].set_title('Storage Size (Lower is Better)')
-axes[1, 1].tick_params(axis='x', rotation=45)
+axes[1, 1].bar(methods, storage_sizes, color="purple")
+axes[1, 1].set_ylabel("Size (MB)")
+axes[1, 1].set_title("Storage Size (Lower is Better)")
+axes[1, 1].tick_params(axis="x", rotation=45)
 
 plt.tight_layout()
 
 # Save the plot
 plot_path = output_dir / "benchmark_comparison.png"
-plt.savefig(plot_path, dpi=150, bbox_inches='tight')
+plt.savefig(plot_path, dpi=150, bbox_inches="tight")
 print(f"   ✓ Plot saved to: {plot_path}")
 
 # Show the plot

@@ -2,7 +2,8 @@
 
 ## 🎯 Overview
 
-This repository now supports comprehensive benchmarking on both **synthetic test data** (fast, no downloads) and **real CryoET data** (production validation).
+This repository now supports comprehensive benchmarking on both **synthetic test
+data** (fast, no downloads) and **real CryoET data** (production validation).
 
 ---
 
@@ -25,7 +26,7 @@ python test_benchmarks_synthetic.py
 
 **Results saved to:** `data/output/test_synthetic/`
 
-###Codecs Tested
+### Codecs Tested
 
 - ✅ **blosc_zstd** - Best compression (1.21×)
 - ✅ **blosc_lz4** - Fastest write (0.009s)
@@ -37,6 +38,7 @@ python test_benchmarks_synthetic.py
 ### Comprehensive Metrics
 
 All tests include:
+
 - **SSIM** (Structural Similarity Index)
 - **PSNR** (Peak Signal-to-Noise Ratio)
 - **MSE** (Mean Squared Error)
@@ -66,12 +68,12 @@ data = generate_synthetic_volume(size=128, pattern='realistic')
 
 ### When to Use Each Pattern
 
-| Pattern | Compressibility | Use Case |
-|---------|----------------|----------|
-| **noise** | Poor | Stress test compression algorithms |
-| **gradient** | Excellent | Best-case compression scenarios |
-| **spheres** | Good | Segmentation/label data testing |
-| **realistic** | Moderate | Realistic benchmarking |
+| Pattern       | Compressibility | Use Case                           |
+| ------------- | --------------- | ---------------------------------- |
+| **noise**     | Poor            | Stress test compression algorithms |
+| **gradient**  | Excellent       | Best-case compression scenarios    |
+| **spheres**   | Good            | Segmentation/label data testing    |
+| **realistic** | Moderate        | Realistic benchmarking             |
 
 ---
 
@@ -80,43 +82,53 @@ data = generate_synthetic_volume(size=128, pattern='realistic')
 ### Notebooks (Interactive)
 
 #### 1. Comprehensive Benchmark
+
 ```bash
 jupyter lab comprehensive_cryoet_notebook.ipynb
 ```
+
 - Downloads real CryoET data (Dataset 10445)
 - Tests 4-6 compression codecs
 - Runtime: ~5-10 minutes
 - Results: Blosc-Zstd achieves 1.19× compression
 
 #### 2. Zarr v2 vs v3 Comparison
+
 ```bash
 jupyter lab zarr_v2_v3_comparison.ipynb
 ```
+
 - Side-by-side v2 and v3 testing
 - Performance and file count analysis
 - Runtime: ~5-10 minutes
 
 #### 3. iohub Format Conversion
+
 ```bash
 jupyter lab iohub_conversion_benchmark.ipynb
 ```
+
 - Tests TIFF ↔ OME-Zarr conversion
 - 5 conversion paths
 - Legacy data migration validation
 - Runtime: ~5-15 minutes
 
 #### 4. Advanced Compression Matrix
+
 ```bash
 jupyter lab advanced_compression_matrix.ipynb
 ```
+
 - Heat maps and Pareto frontier analysis
 - 100-150 configurations tested
 - Runtime: ~30-60 minutes
 
 #### 5. QC & Benchmarking Tool
+
 ```bash
 jupyter lab cryoet_qc_benchmark_tool.ipynb
 ```
+
 - PixelPatrol-inspired quality control
 - 7 comprehensive QC checks
 - Integrated with benchmarking
@@ -124,16 +136,19 @@ jupyter lab cryoet_qc_benchmark_tool.ipynb
 ### Python Scripts (CLI)
 
 #### Quick Test (30 seconds)
+
 ```bash
 python cryoet_real_data_quick.py
 ```
 
 #### Comprehensive Chunking Benchmark (5 minutes)
+
 ```bash
 python cryoet_chunking_benchmark.py
 ```
 
 #### Advanced Multi-Run Benchmark
+
 ```bash
 python cryoet_advanced_benchmark.py
 ```
@@ -158,7 +173,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.13'
+          python-version: "3.13"
       - name: Install dependencies
         run: pip install -r requirements-cryoet.txt
       - name: Run synthetic benchmarks
@@ -183,38 +198,41 @@ fi
 
 ### Synthetic Data (128³ volume, 8 MB)
 
-| Test Category | Tests | Runtime |
-|--------------|-------|---------|
-| Compression Codecs | 6 | ~0.5s |
-| Zarr Versions | 2 | ~0.1s |
-| Chunking Strategies | 3 | ~0.3s |
-| Data Integrity | 5 | ~0.3s |
-| **Total** | **16** | **~1.2s** |
+| Test Category       | Tests  | Runtime   |
+| ------------------- | ------ | --------- |
+| Compression Codecs  | 6      | ~0.5s     |
+| Zarr Versions       | 2      | ~0.1s     |
+| Chunking Strategies | 3      | ~0.3s     |
+| Data Integrity      | 5      | ~0.3s     |
+| **Total**           | **16** | **~1.2s** |
 
 ### Real CryoET Data (256³ volume, 64 MB)
 
-| Task | Runtime |
-|------|---------|
-| Download from S3 | ~60s |
-| Quick benchmark | ~30s |
-| Comprehensive | ~5-10min |
-| Advanced matrix | ~30-60min |
+| Task             | Runtime   |
+| ---------------- | --------- |
+| Download from S3 | ~60s      |
+| Quick benchmark  | ~30s      |
+| Comprehensive    | ~5-10min  |
+| Advanced matrix  | ~30-60min |
 
 ---
 
 ## 🎓 Best Practices
 
 ### For Development
+
 1. Use **synthetic tests** for quick validation
 2. Test with `realistic` pattern for most accurate results
 3. Run full suite before committing
 
 ### For Production
+
 1. Validate on **real CryoET data** first
 2. Test multiple datasets for robustness
 3. Compare against your existing pipeline
 
 ### For Research
+
 1. Use **advanced compression matrix** for thorough analysis
 2. Include **QC checks** before compression
 3. Document results in `GALLERY.md`
@@ -224,6 +242,7 @@ fi
 ## 🐛 Troubleshooting
 
 ### Zarr v3 Tests Failing
+
 ```python
 # Ensure experimental API is enabled
 import os
@@ -231,17 +250,20 @@ os.environ['ZARR_V3_EXPERIMENTAL_API'] = '1'
 ```
 
 ### iohub Import Errors
+
 ```bash
 pip install iohub>=0.2.2
 ```
 
 ### Slow Downloads
+
 ```python
 # Use smaller download size
 DOWNLOAD_SIZE = 128  # Instead of 256 or 512
 ```
 
 ### Memory Issues
+
 ```python
 # Generate smaller synthetic volumes
 data = generate_synthetic_volume(size=64)  # Instead of 128 or 256
@@ -285,6 +307,7 @@ data/output/
 ## ✅ Quality Assurance
 
 All tests verify:
+
 - ✓ Lossless compression (exact data match)
 - ✓ Image quality metrics (SSIM ≥ 0.9999)
 - ✓ Performance benchmarks
@@ -304,12 +327,12 @@ All tests verify:
 
 ## 🔗 Resources
 
-- **HEFTIE Project:** https://heftieproject.github.io/zarr-benchmarks/
-- **CryoET Portal:** https://cryoetdataportal.czscience.com/
-- **iohub:** https://github.com/czbiohub-sf/iohub
-- **Zarr:** https://zarr.readthedocs.io/
-- **OME-NGFF:** https://ngff.openmicroscopy.org/
+- **HEFTIE Project:** <https://heftieproject.github.io/zarr-benchmarks/>
+- **CryoET Portal:** <https://cryoetdataportal.czscience.com/>
+- **iohub:** <https://github.com/czbiohub-sf/iohub>
+- **Zarr:** <https://zarr.readthedocs.io/>
+- **OME-NGFF:** <https://ngff.openmicroscopy.org/>
 
 ---
 
-*Last updated: November 14, 2025*
+_Last updated: November 14, 2025_

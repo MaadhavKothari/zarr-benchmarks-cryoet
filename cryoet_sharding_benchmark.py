@@ -4,15 +4,17 @@ CryoET Zarr v3 Sharding Benchmark
 Test different chunk sizes, shard sizes, and compression methods with Zarr v3 sharding
 """
 
-import numpy as np
 import pathlib
 import time
-import pandas as pd
+
 import matplotlib.pyplot as plt
-from cryoet_data_portal import Client, Dataset
+import numpy as np
+import pandas as pd
 import s3fs
 import zarr
-from zarr.codecs import BloscCodec, ZstdCodec, ShardingCodec, BytesCodec
+from cryoet_data_portal import Client, Dataset
+from zarr.codecs import BloscCodec, BytesCodec, ShardingCodec
+
 from zarr_benchmarks import utils
 
 print("=" * 80)
@@ -42,7 +44,11 @@ zarr_group = zarr.open(store, mode="r")
 zarr_array = zarr_group["0"]
 
 # Download 128³ subset from center
-z_c, y_c, x_c = zarr_array.shape[0] // 2, zarr_array.shape[1] // 2, zarr_array.shape[2] // 2
+z_c, y_c, x_c = (
+    zarr_array.shape[0] // 2,
+    zarr_array.shape[1] // 2,
+    zarr_array.shape[2] // 2,
+)
 size = 128
 
 start_time = time.time()
@@ -211,7 +217,10 @@ for chunk_size in [32, 64, 128]:
         real_data,
         store_path,
         lambda cs=chunk_size: write_zarr_v3_no_sharding(
-            real_data, output_dir / f"v3_no_shard_chunks_{cs}.zarr", (cs, cs, cs), blosc_zstd_v3
+            real_data,
+            output_dir / f"v3_no_shard_chunks_{cs}.zarr",
+            (cs, cs, cs),
+            blosc_zstd_v3,
         ),
     )
     results.append(result)
@@ -345,7 +354,7 @@ v2_files = df[df["name"].str.startswith("v2")]["file_count"].mean()
 v3_noshard_files = df[df["name"].str.startswith("v3_noshard")]["file_count"].mean()
 v3_shard_files = df[df["name"].str.startswith("v3_shard")]["file_count"].mean()
 
-print(f"\n📁 File Count Reduction:")
+print("\n📁 File Count Reduction:")
 print(f"   Zarr v2 average: {v2_files:.0f} files")
 print(f"   Zarr v3 (no shard) average: {v3_noshard_files:.0f} files")
 print(f"   Zarr v3 (with shard) average: {v3_shard_files:.0f} files")
@@ -359,7 +368,7 @@ best_read = df.loc[df["read_time"].idxmin()]
 best_compression = df.loc[df["compression_ratio"].idxmax()]
 fewest_files = df.loc[df["file_count"].idxmin()]
 
-print(f"\n🏆 Best Performers:")
+print("\n🏆 Best Performers:")
 print(f"   Fastest write: {best_write['name']} ({best_write['write_time']:.3f}s)")
 print(f"   Fastest read: {best_read['name']} ({best_read['read_time']:.3f}s)")
 print(
@@ -460,7 +469,10 @@ for cat, data in [("v2", v2_data), ("v3_noshard", v3_noshard), ("v3_shard", v3_s
     # Add labels
     for _, row in data.iterrows():
         ax.annotate(
-            row["name"].split("_")[-1], (row["write_time"], row["read_time"]), fontsize=8, alpha=0.7
+            row["name"].split("_")[-1],
+            (row["write_time"], row["read_time"]),
+            fontsize=8,
+            alpha=0.7,
         )
 ax.set_xlabel("Write Time (s)")
 ax.set_ylabel("Read Time (s)")

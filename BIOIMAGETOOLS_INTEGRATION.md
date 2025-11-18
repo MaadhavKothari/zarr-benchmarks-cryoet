@@ -1,13 +1,14 @@
 # Integration with BioImageTools Benchmarking
 
-**Source:** https://github.com/BioImageTools/zarr-chunk-benchmarking
+**Source:** <https://github.com/BioImageTools/zarr-chunk-benchmarking>
 **Incorporated:** November 12, 2025
 
 ---
 
 ## 🎯 What We Learned
 
-The BioImageTools zarr-chunk-benchmarking repository demonstrated several best practices that we've now incorporated into our CryoET benchmarks.
+The BioImageTools zarr-chunk-benchmarking repository demonstrated several best
+practices that we've now incorporated into our CryoET benchmarks.
 
 ---
 
@@ -16,16 +17,19 @@ The BioImageTools zarr-chunk-benchmarking repository demonstrated several best p
 ### 1. **Statistical Validation (Multiple Runs)**
 
 **Their approach:**
+
 - Run each configuration 3 times (`n_runs=3`)
 - Capture variability in performance
 - Use min/max bounds for visualization
 
 **Why it matters:**
+
 - Single-run benchmarks can be misleading
 - Performance varies due to system state, caching, other processes
 - Statistical validation gives confidence in results
 
 **What we adopted:**
+
 ```python
 # Multiple runs per configuration
 N_RUNS = 3
@@ -47,16 +51,19 @@ def benchmark_write_multi_run(data, store_path, chunks, compressor, n_runs=3):
 ### 2. **Concurrent Access Patterns**
 
 **Their approach:**
+
 - Test with multiple threads (`threads=4`)
 - Simulates real-world usage (multiple users/processes)
 - More realistic than sequential benchmarks
 
 **Why it matters:**
+
 - Single-threaded tests don't reflect production scenarios
 - Concurrent access reveals contention issues
 - Important for visualization tools (multiple slices loading)
 
 **What we adopted:**
+
 ```python
 def benchmark_read_slices_concurrent(store_path, n_slices=10, n_threads=4):
     """Simulate concurrent slice viewing."""
@@ -73,11 +80,13 @@ def benchmark_read_slices_concurrent(store_path, n_slices=10, n_threads=4):
 ### 3. **Systematic Parameter Sweeps**
 
 **Their approach:**
+
 - Define parameter ranges upfront
 - Test all combinations systematically
 - Document configuration space
 
 **Configuration example:**
+
 ```python
 bench_plan = {
     'volume_size': [2048, 2048, 128],
@@ -87,6 +96,7 @@ bench_plan = {
 ```
 
 **What we adopted:**
+
 ```python
 CHUNK_CONFIGS = [
     (16, 16, 16),
@@ -108,11 +118,13 @@ COMPRESSION_CONFIGS = [
 ### 4. **Structured Result Storage**
 
 **Their approach:**
+
 - Use Pandas DataFrame
 - Store timing data as lists
 - Enable easy filtering and grouping
 
 **What we adopted:**
+
 ```python
 results = []
 for config in configurations:
@@ -134,11 +146,13 @@ df.to_csv('results.csv', index=False)
 ### 5. **Error Bar Visualizations**
 
 **Their approach:**
+
 - Plot with `errorbar()` using min/max bounds
 - Visual representation of variability
 - Grouped by configuration parameter
 
 **What we adopted:**
+
 ```python
 ax.errorbar(x, df['write_mean'],
            yerr=[df['write_mean'] - df['write_min'],
@@ -155,24 +169,28 @@ ax.errorbar(x, df['write_mean'],
 ### New Features
 
 #### 1. **Statistical Validation**
+
 - 3 runs per configuration
 - Mean ± std deviation reported
 - Min/max bounds visualized
 - Coefficient of variation analysis
 
 #### 2. **Concurrent Access Testing**
+
 - 4 concurrent threads (configurable)
 - Sequential vs concurrent comparison
 - Speedup factor calculation
 - Simulates real visualization tools
 
 #### 3. **Random Access Patterns**
+
 - 32³ ROI extraction (20 random positions)
 - Mimics common analysis workflows
 - Tests chunk layout effectiveness
 - Measures seek time + read time
 
 #### 4. **Comprehensive Metrics**
+
 - Write performance (multi-run)
 - Full read performance (multi-run)
 - Concurrent slice reads
@@ -182,6 +200,7 @@ ax.errorbar(x, df['write_mean'],
 - Compression ratio
 
 #### 5. **Advanced Visualizations**
+
 - Error bars on all timing plots
 - Grouped by compression method
 - Concurrent speedup analysis
@@ -192,30 +211,32 @@ ax.errorbar(x, df['write_mean'],
 
 ## 📊 Comparison: Basic vs Advanced Benchmark
 
-| Feature | Basic Benchmark | Advanced Benchmark |
-|---------|----------------|-------------------|
-| **Runs per config** | 1 | 3 |
-| **Statistical analysis** | ❌ | ✅ (mean, std, min, max) |
-| **Concurrent access** | ❌ | ✅ (4 threads) |
-| **Random access** | ❌ | ✅ (ROI extraction) |
-| **Error bars** | ❌ | ✅ |
-| **Pandas DataFrame** | ❌ | ✅ |
-| **JSON summary** | ❌ | ✅ |
-| **Time to run** | ~5 min | ~15 min |
-| **Result confidence** | Low | High |
+| Feature                  | Basic Benchmark | Advanced Benchmark       |
+| ------------------------ | --------------- | ------------------------ |
+| **Runs per config**      | 1               | 3                        |
+| **Statistical analysis** | ❌              | ✅ (mean, std, min, max) |
+| **Concurrent access**    | ❌              | ✅ (4 threads)           |
+| **Random access**        | ❌              | ✅ (ROI extraction)      |
+| **Error bars**           | ❌              | ✅                       |
+| **Pandas DataFrame**     | ❌              | ✅                       |
+| **JSON summary**         | ❌              | ✅                       |
+| **Time to run**          | ~5 min          | ~15 min                  |
+| **Result confidence**    | Low             | High                     |
 
 ---
 
 ## 🎯 When to Use Each
 
-### Use Basic Benchmark (`cryoet_chunking_benchmark.py`):
+### Use Basic Benchmark (`cryoet_chunking_benchmark.py`)
+
 - Quick exploration
 - Initial parameter screening
 - Comparing few configurations
 - Educational purposes
 - Time-constrained
 
-### Use Advanced Benchmark (`cryoet_advanced_benchmark.py`):
+### Use Advanced Benchmark (`cryoet_advanced_benchmark.py`)
+
 - Production recommendations
 - Publication-quality results
 - Comparing many configurations
@@ -229,11 +250,13 @@ ax.errorbar(x, df['write_mean'],
 ### Statistical Validation Impact
 
 **Basic (1 run):**
+
 ```
 blosc_zstd 64³: Write 0.024s, Read 0.005s
 ```
 
 **Advanced (3 runs):**
+
 ```
 blosc_zstd 64³: Write 0.024 ± 0.002s (min: 0.022s, max: 0.026s)
                 Read 0.005 ± 0.0003s (min: 0.0047s, max: 0.0053s)
@@ -244,11 +267,13 @@ blosc_zstd 64³: Write 0.024 ± 0.002s (min: 0.022s, max: 0.026s)
 ### Concurrency Impact
 
 **Sequential (4 slices):**
+
 ```
 blosc_zstd 64³: 4 slices × 1.7ms = 6.8ms total
 ```
 
 **Concurrent (4 threads):**
+
 ```
 blosc_zstd 64³: 4 slices / 4 threads = 2.1ms total
 Speedup: 3.2× (92% parallel efficiency!)
@@ -299,6 +324,7 @@ parallel_efficiency = (speedup / N_THREADS) * 100
 ## 💡 Best Practices We Now Follow
 
 ### 1. **Always Run Multiple Times**
+
 ```python
 # Don't trust single-run results!
 N_RUNS = 3  # minimum
@@ -307,12 +333,14 @@ N_RUNS = 10  # publication quality
 ```
 
 ### 2. **Report Uncertainty**
+
 ```python
 # Always include error bars/confidence intervals
 print(f"Write: {mean:.3f} ± {std:.3f}s")
 ```
 
 ### 3. **Test Realistic Patterns**
+
 ```python
 # Not just sequential reads - test:
 # - Concurrent access (multiple users)
@@ -321,6 +349,7 @@ print(f"Write: {mean:.3f} ± {std:.3f}s")
 ```
 
 ### 4. **Document Configuration Space**
+
 ```python
 # Clear upfront what you're testing
 BENCHMARK_PLAN = {
@@ -333,6 +362,7 @@ BENCHMARK_PLAN = {
 ```
 
 ### 5. **Structured Results**
+
 ```python
 # Use DataFrame, not nested dicts
 df = pd.DataFrame(results)
@@ -358,6 +388,7 @@ python cryoet_advanced_benchmark.py
 ### Configuration Options
 
 Edit the script to customize:
+
 ```python
 N_RUNS = 3        # Increase for more confidence
 N_THREADS = 4     # Match your typical workload
@@ -379,6 +410,7 @@ blosc_zstd_5,64,64,64,0.024,0.002,0.022,0.026,...
 ```
 
 **Key columns:**
+
 - `write_mean/std/min/max` - Write performance statistics
 - `read_full_mean/std/min/max` - Full read statistics
 - `slice_speedup` - Concurrent vs sequential ratio
@@ -400,6 +432,7 @@ blosc_zstd_5,64,64,64,0.024,0.002,0.022,0.026,...
 ```
 
 **Use for:**
+
 - Automated decision-making
 - CI/CD performance regression
 - Recommendation engines
@@ -462,10 +495,11 @@ Statistical confidence → Production recommendation
 ## 🙏 Acknowledgments
 
 **BioImageTools Team:** For demonstrating best practices in Zarr benchmarking
-**Repository:** https://github.com/BioImageTools/zarr-chunk-benchmarking
+**Repository:** <https://github.com/BioImageTools/zarr-chunk-benchmarking>
 **Notebook:** benchmark.ipynb (generate-bench-plots branch)
 
 Their work helped us improve:
+
 - Statistical rigor
 - Realistic testing scenarios
 - Result presentation
@@ -476,19 +510,22 @@ Their work helped us improve:
 ## 📚 References
 
 1. **BioImageTools Zarr Benchmarking**
-   - https://github.com/BioImageTools/zarr-chunk-benchmarking
+
+   - <https://github.com/BioImageTools/zarr-chunk-benchmarking>
    - Systematic approach to chunk optimization
 
 2. **HEFTIE Project**
-   - https://github.com/HEFTIEProject/zarr-benchmarks
+
+   - <https://github.com/HEFTIEProject/zarr-benchmarks>
    - Original framework we build on
 
 3. **Zarr Specification**
-   - https://zarr.dev/
+
+   - <https://zarr.dev/>
    - Understanding chunk behavior
 
 4. **Statistical Benchmarking**
-   - https://doi.org/10.1145/3297858.3304072
+   - <https://doi.org/10.1145/3297858.3304072>
    - Best practices for performance evaluation
 
 ---
@@ -496,6 +533,7 @@ Their work helped us improve:
 ## ✅ Summary
 
 **What we learned from BioImageTools:**
+
 - Multiple runs for statistical validation
 - Concurrent access pattern testing
 - Error bars in visualizations
@@ -503,6 +541,7 @@ Their work helped us improve:
 - Systematic parameter sweeps
 
 **What we built:**
+
 - `cryoet_advanced_benchmark.py` - Enhanced benchmark script
 - Statistical validation (mean, std, min, max)
 - Concurrent slice reading (4 threads)
@@ -511,12 +550,14 @@ Their work helped us improve:
 - JSON summary for automation
 
 **Impact:**
+
 - Higher confidence in recommendations
 - Better understanding of variability
 - Realistic performance predictions
 - Publication-quality results
 
 **Next steps:**
+
 - Run advanced benchmark on your data
 - Compare basic vs advanced results
 - Use statistics for decision-making

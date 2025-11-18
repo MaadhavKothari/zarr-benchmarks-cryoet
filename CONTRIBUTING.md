@@ -1,32 +1,38 @@
 # Contributing to Zarr-Benchmarks CryoET Extension
 
-Thank you for your interest in contributing! This document provides guidelines for contributing to the CryoET extension of the zarr-benchmarks project.
+Thank you for your interest in contributing! This document provides guidelines
+for contributing to the CryoET extension of the zarr-benchmarks project.
 
 ---
 
 ## 🎯 Ways to Contribute
 
 ### 1. Testing on New Datasets
+
 - Try benchmarks on different CryoET datasets
 - Test on other scientific imaging data (MRI, light sheet, etc.)
 - Report results and any issues
 
 ### 2. Adding New Benchmarks
+
 - Implement lossy compression tests (ZFP, SZ3)
 - Add network performance tests
 - Benchmark different storage backends
 
 ### 3. Improving Documentation
+
 - Fix typos or unclear explanations
 - Add examples or tutorials
 - Translate documentation
 
 ### 4. Code Improvements
+
 - Optimize benchmark performance
 - Add error handling
 - Improve code quality
 
 ### 5. Zarr v3 Integration
+
 - Test sharding when ecosystem is ready
 - Compare v2 vs v3 performance
 - Update scripts for v3 API
@@ -36,6 +42,7 @@ Thank you for your interest in contributing! This document provides guidelines f
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 ```bash
 # Python 3.13 recommended
 python --version  # Should be 3.13.x
@@ -45,6 +52,7 @@ git --version
 ```
 
 ### Setup Development Environment
+
 ```bash
 # Fork and clone
 git clone https://github.com/YOUR_USERNAME/zarr-benchmarks.git
@@ -66,6 +74,7 @@ pre-commit install
 ```
 
 ### Verify Installation
+
 ```bash
 # Run quick test
 python test_cryoet_connection_v2.py
@@ -78,7 +87,9 @@ python test_cryoet_connection_v2.py
 ## 📋 Contribution Workflow
 
 ### 1. Create an Issue
+
 Before starting work, create an issue describing:
+
 - What you plan to add/fix
 - Why it's needed
 - How you'll implement it
@@ -86,6 +97,7 @@ Before starting work, create an issue describing:
 **Wait for feedback** before investing significant time.
 
 ### 2. Create a Branch
+
 ```bash
 # Update main
 git checkout main
@@ -98,12 +110,14 @@ git checkout -b fix/issue-number-description
 ```
 
 ### 3. Make Changes
+
 - Follow code style guidelines (see below)
 - Add tests if applicable
 - Update documentation
 - Keep commits atomic and well-described
 
 ### 4. Test Your Changes
+
 ```bash
 # Run quick benchmark
 python cryoet_real_data_quick.py
@@ -118,6 +132,7 @@ mypy src/
 ```
 
 ### 5. Commit Changes
+
 ```bash
 # Stage changes
 git add <files>
@@ -131,6 +146,7 @@ git commit -m "feat: add ZFP compression benchmark
 ```
 
 **Commit Message Format:**
+
 ```
 <type>: <subject>
 
@@ -140,6 +156,7 @@ git commit -m "feat: add ZFP compression benchmark
 ```
 
 **Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation changes
@@ -149,6 +166,7 @@ git commit -m "feat: add ZFP compression benchmark
 - `chore`: Maintenance tasks
 
 ### 6. Push and Create PR
+
 ```bash
 # Push to your fork
 git push origin feature/descriptive-name
@@ -162,6 +180,7 @@ git push origin feature/descriptive-name
 ## 📏 Code Style Guidelines
 
 ### Python Style
+
 - **Formatter:** Black (line length 100)
 - **Linter:** Ruff
 - **Type Checker:** MyPy (optional but encouraged)
@@ -197,6 +216,7 @@ def benchmark_compression(
 ```
 
 ### File Organization
+
 ```python
 # Standard library imports
 import pathlib
@@ -214,6 +234,7 @@ from zarr_benchmarks.read_write_zarr import read_write_zarr
 ```
 
 ### Naming Conventions
+
 - **Variables:** `snake_case`
 - **Functions:** `snake_case`
 - **Classes:** `PascalCase`
@@ -225,6 +246,7 @@ from zarr_benchmarks.read_write_zarr import read_write_zarr
 ## 🧪 Testing Guidelines
 
 ### Adding Tests
+
 ```python
 # tests/test_cryoet_benchmarks.py
 import pytest
@@ -246,6 +268,7 @@ def test_benchmark_compression():
 ```
 
 ### Running Tests
+
 ```bash
 # All tests
 pytest
@@ -262,40 +285,50 @@ pytest --cov=src/zarr_benchmarks --cov-report=html
 ## 📖 Documentation Guidelines
 
 ### Updating Reports
+
 When adding new benchmarks, update:
+
 1. **README_CRYOET_EXTENSION.md** - Add to quick results
 2. **EXECUTIVE_SUMMARY.md** - Update recommendations
 3. **TECHNICAL_REPORT.md** - Add detailed analysis
 4. **ROADMAP.md** - Mark as completed
 
 ### Adding New Documentation
+
 - Use Markdown
 - Include code examples
 - Add visualizations where helpful
 - Link to related docs
 
 ### Documentation Structure
+
 ```markdown
 # Title
 
 **Brief description**
 
 ## Overview
+
 [What and why]
 
 ## Quick Start
+
 [Minimal example]
 
 ## Detailed Guide
+
 [Step by step]
 
 ## Results
+
 [Tables, plots]
 
 ## Recommendations
+
 [Actionable advice]
 
 ## References
+
 [Links]
 ```
 
@@ -304,6 +337,7 @@ When adding new benchmarks, update:
 ## 🎨 Adding Visualizations
 
 ### Plot Style
+
 ```python
 import matplotlib.pyplot as plt
 
@@ -328,6 +362,7 @@ plt.savefig('output.png', dpi=150, bbox_inches='tight')
 ```
 
 ### Figure Requirements
+
 - **Resolution:** 150 DPI minimum
 - **Format:** PNG for web, PDF for papers
 - **Size:** <1 MB for README images
@@ -338,19 +373,24 @@ plt.savefig('output.png', dpi=150, bbox_inches='tight')
 ## 🐛 Reporting Issues
 
 ### Bug Reports
+
 Use the issue template and include:
+
 1. **Description:** What happened vs what you expected
 2. **Environment:**
+
    ```
    - OS: [e.g., macOS 14.1, Ubuntu 22.04]
    - Python: [e.g., 3.13.0]
    - Zarr: [e.g., 2.18.7]
    ```
+
 3. **Reproduction:** Minimal code to reproduce
 4. **Logs:** Error messages and tracebacks
 5. **Data:** Sample data if relevant (or description)
 
 ### Feature Requests
+
 1. **Use case:** Why is this needed?
 2. **Proposal:** How should it work?
 3. **Alternatives:** What else did you consider?
@@ -361,12 +401,14 @@ Use the issue template and include:
 ## 🔍 Code Review Process
 
 ### For Contributors
+
 - Respond to feedback promptly
 - Be open to suggestions
 - Update PR based on reviews
 - Mark conversations as resolved when addressed
 
 ### Review Checklist
+
 - [ ] Code follows style guidelines
 - [ ] Tests added/updated
 - [ ] Documentation updated
@@ -379,18 +421,21 @@ Use the issue template and include:
 ## 🌟 Contribution Ideas
 
 ### Beginner-Friendly
+
 - [ ] Fix typos in documentation
 - [ ] Add code comments
 - [ ] Improve error messages
 - [ ] Add examples to README
 
 ### Intermediate
+
 - [ ] Test on new datasets
 - [ ] Add visualization improvements
 - [ ] Optimize performance
 - [ ] Add CLI interface
 
 ### Advanced
+
 - [ ] Implement Zarr v3 sharding tests
 - [ ] Add lossy compression benchmarks
 - [ ] Create web-based tool
@@ -401,11 +446,13 @@ Use the issue template and include:
 ## 📞 Getting Help
 
 ### Questions?
+
 - Open a discussion on GitHub
-- Ask in Zarr Discourse: https://zarr.discourse.group/
+- Ask in Zarr Discourse: <https://zarr.discourse.group/>
 - Check existing issues/PRs
 
 ### Stuck?
+
 - Review example scripts
 - Check documentation
 - Ask for clarification in your PR/issue
@@ -415,6 +462,7 @@ Use the issue template and include:
 ## 🙏 Recognition
 
 Contributors will be:
+
 - Listed in README acknowledgments
 - Mentioned in release notes
 - Credited in academic papers (if applicable)
@@ -424,33 +472,40 @@ Contributors will be:
 ## 📜 Code of Conduct
 
 ### Our Pledge
+
 We are committed to providing a welcoming and inclusive environment.
 
 ### Expected Behavior
+
 - Be respectful and constructive
 - Welcome newcomers
 - Focus on what's best for the community
 - Show empathy
 
 ### Unacceptable Behavior
+
 - Harassment or discrimination
 - Trolling or insulting comments
 - Publishing others' private information
 - Other unprofessional conduct
 
 ### Enforcement
-Violations can be reported to project maintainers. All complaints will be reviewed and investigated.
+
+Violations can be reported to project maintainers. All complaints will be
+reviewed and investigated.
 
 ---
 
 ## 📄 License
 
-By contributing, you agree that your contributions will be licensed under the same license as the project (MIT License).
+By contributing, you agree that your contributions will be licensed under the
+same license as the project (MIT License).
 
 ---
 
-## 🎉 Thank You!
+## 🎉 Thank You
 
-Every contribution, no matter how small, is valued and appreciated. Together we can make Zarr benchmarking better for the scientific community!
+Every contribution, no matter how small, is valued and appreciated. Together we
+can make Zarr benchmarking better for the scientific community!
 
 **Happy contributing! 🚀**

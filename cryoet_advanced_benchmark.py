@@ -9,19 +9,21 @@ Incorporates best practices:
 - Error bars in visualizations
 """
 
-import numpy as np
+import json
 import pathlib
 import time
-import pandas as pd
-import matplotlib.pyplot as plt
 from concurrent.futures import ThreadPoolExecutor
-from cryoet_data_portal import Client, Dataset
+from typing import Dict, Tuple
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import s3fs
 import zarr
+from cryoet_data_portal import Client, Dataset
 from numcodecs import Blosc
+
 from zarr_benchmarks import utils
-from typing import Dict, List, Tuple
-import json
 
 print("=" * 80)
 print("CRYOET ADVANCED BENCHMARK (Statistical Validation)")
@@ -56,7 +58,7 @@ COMPRESSION_CONFIGS = [
     ("no_compression", None),
 ]
 
-print(f"\n⚙️  Configuration:")
+print("\n⚙️  Configuration:")
 print(f"   Runs per test: {N_RUNS}")
 print(f"   Concurrent threads: {N_THREADS}")
 print(f"   Chunk configs: {len(CHUNK_CONFIGS)}")
@@ -82,7 +84,11 @@ zarr_group = zarr.open(store, mode="r")
 zarr_array = zarr_group["0"]
 
 # Download 128³ subset
-z_c, y_c, x_c = zarr_array.shape[0] // 2, zarr_array.shape[1] // 2, zarr_array.shape[2] // 2
+z_c, y_c, x_c = (
+    zarr_array.shape[0] // 2,
+    zarr_array.shape[1] // 2,
+    zarr_array.shape[2] // 2,
+)
 size = 128
 
 real_data = np.array(
@@ -193,7 +199,9 @@ def benchmark_read_slices_concurrent(
     }
 
 
-def benchmark_random_access(store_path: pathlib.Path, n_accesses: int = 20) -> Dict[str, float]:
+def benchmark_random_access(
+    store_path: pathlib.Path, n_accesses: int = 20
+) -> Dict[str, float]:
     """Benchmark random small region access (ROI extraction pattern)."""
     zarr_arr = zarr.open_array(store_path, mode="r")
 
@@ -244,20 +252,30 @@ for comp_name, compressor in COMPRESSION_CONFIGS:
         store_path = output_dir / f"{comp_name}_{chunk_label}.zarr"
 
         # Write benchmarks (multiple runs)
-        write_stats = benchmark_write_multi_run(real_data, store_path, chunks, compressor)
-        print(f"W:{write_stats['mean']:.3f}±{write_stats['std']:.3f}s", end=" ", flush=True)
+        write_stats = benchmark_write_multi_run(
+            real_data, store_path, chunks, compressor
+        )
+        print(
+            f"W:{write_stats['mean']:.3f}±{write_stats['std']:.3f}s",
+            end=" ",
+            flush=True,
+        )
 
         # Read benchmarks (multiple runs)
         read_full_stats = benchmark_read_full_multi_run(store_path)
-        print(f"R:{read_full_stats['mean']:.3f}±{read_full_stats['std']:.3f}s", end=" ", flush=True)
+        print(
+            f"R:{read_full_stats['mean']:.3f}±{read_full_stats['std']:.3f}s",
+            end=" ",
+            flush=True,
+        )
 
         # Concurrent slice reads
         slice_stats = benchmark_read_slices_concurrent(store_path)
-        print(f"S:{slice_stats['concurrent_mean']*1000:.1f}ms", end=" ", flush=True)
+        print(f"S:{slice_stats['concurrent_mean'] * 1000:.1f}ms", end=" ", flush=True)
 
         # Random access
         random_stats = benchmark_random_access(store_path)
-        print(f"ROI:{random_stats['mean']*1000:.1f}ms", end=" ")
+        print(f"ROI:{random_stats['mean'] * 1000:.1f}ms", end=" ")
 
         # Storage metrics
         storage_size = utils.get_directory_size(store_path) / (1024**2)
@@ -333,7 +351,11 @@ with open(summary_path, "w") as f:
 print("\n📈 4. Creating visualizations...")
 
 fig = plt.figure(figsize=(20, 12))
-fig.suptitle("Advanced CryoET Benchmarks - Statistical Validation", fontsize=16, fontweight="bold")
+fig.suptitle(
+    "Advanced CryoET Benchmarks - Statistical Validation",
+    fontsize=16,
+    fontweight="bold",
+)
 
 # Group by compression for comparison
 for idx, comp_name in enumerate(["blosc_zstd_5", "blosc_lz4_3", "no_compression"]):
@@ -423,7 +445,13 @@ fig.suptitle("Concurrency & Access Pattern Analysis", fontsize=16, fontweight="b
 ax = axes[0, 0]
 for comp_name in df["compression"].unique():
     df_comp = df[df["compression"] == comp_name]
-    ax.plot(df_comp["chunk_label"], df_comp["slice_speedup"], "o-", label=comp_name, markersize=8)
+    ax.plot(
+        df_comp["chunk_label"],
+        df_comp["slice_speedup"],
+        "o-",
+        label=comp_name,
+        markersize=8,
+    )
 ax.axhline(y=1.0, color="r", linestyle="--", alpha=0.5, label="No speedup")
 ax.set_xlabel("Chunk Configuration")
 ax.set_ylabel("Speedup Factor")
@@ -498,31 +526,41 @@ print("\n" + "=" * 80)
 print("📊 STATISTICAL SUMMARY")
 print("=" * 80)
 
-print(f"\n🔬 Test Configuration:")
+print("\n🔬 Test Configuration:")
 print(f"   Runs per config: {N_RUNS}")
 print(f"   Concurrent threads: {N_THREADS}")
 print(f"   Total configs tested: {len(results)}")
 
-print(f"\n🏆 Best Performers (mean ± std):")
+print("\n🏆 Best Performers (mean ± std):")
 best_write = df.loc[df["write_mean"].idxmin()]
 print(f"   Fastest write: {best_write['compression']} {best_write['chunk_label']}")
 print(f"      Time: {best_write['write_mean']:.3f} ± {best_write['write_std']:.3f}s")
 
 best_read = df.loc[df["read_full_mean"].idxmin()]
 print(f"   Fastest read: {best_read['compression']} {best_read['chunk_label']}")
-print(f"      Time: {best_read['read_full_mean']:.3f} ± {best_read['read_full_std']:.3f}s")
+print(
+    f"      Time: {best_read['read_full_mean']:.3f} ± {best_read['read_full_std']:.3f}s"
+)
 
 best_concurrent = df.loc[df["slice_speedup"].idxmax()]
-print(f"   Best concurrent: {best_concurrent['compression']} {best_concurrent['chunk_label']}")
+print(
+    f"   Best concurrent: {best_concurrent['compression']} {best_concurrent['chunk_label']}"
+)
 print(f"      Speedup: {best_concurrent['slice_speedup']:.2f}×")
 
 best_compression = df.loc[df["compression_ratio"].idxmax()]
-print(f"   Best compression: {best_compression['compression']} {best_compression['chunk_label']}")
+print(
+    f"   Best compression: {best_compression['compression']} {best_compression['chunk_label']}"
+)
 print(f"      Ratio: {best_compression['compression_ratio']:.2f}×")
 
-print(f"\n📏 Performance Variability:")
-print(f"   Write std/mean: {(df['write_std'] / df['write_mean']).mean() * 100:.1f}% (avg)")
-print(f"   Read std/mean: {(df['read_full_std'] / df['read_full_mean']).mean() * 100:.1f}% (avg)")
+print("\n📏 Performance Variability:")
+print(
+    f"   Write std/mean: {(df['write_std'] / df['write_mean']).mean() * 100:.1f}% (avg)"
+)
+print(
+    f"   Read std/mean: {(df['read_full_std'] / df['read_full_mean']).mean() * 100:.1f}% (avg)"
+)
 print(
     f"   {'Low variability = consistent performance' if (df['write_std'] / df['write_mean']).mean() < 0.1 else 'High variability detected'}"
 )

@@ -4,16 +4,18 @@ CryoET Real Data Quick Benchmark (No Pause)
 Download, visualize, and benchmark real cryo-EM tomography data
 """
 
-import numpy as np
 import pathlib
 import time
-import pandas as pd
+
 import matplotlib.pyplot as plt
-from cryoet_data_portal import Client, Dataset
+import numpy as np
+import pandas as pd
 import s3fs
 import zarr
-from zarr_benchmarks.read_write_zarr import read_write_zarr
+from cryoet_data_portal import Client, Dataset
+
 from zarr_benchmarks import utils
+from zarr_benchmarks.read_write_zarr import read_write_zarr
 
 print("=" * 70)
 print("CRYOET REAL DATA QUICK BENCHMARK")
@@ -47,7 +49,11 @@ print(f"   ✓ Size: {zarr_array.nbytes / (1024**3):.2f} GB")
 
 # Download subset
 print("\n⬇️  4. Downloading 128³ subset from center...")
-z_c, y_c, x_c = zarr_array.shape[0] // 2, zarr_array.shape[1] // 2, zarr_array.shape[2] // 2
+z_c, y_c, x_c = (
+    zarr_array.shape[0] // 2,
+    zarr_array.shape[1] // 2,
+    zarr_array.shape[2] // 2,
+)
 size = 128
 
 start_time = time.time()
@@ -74,7 +80,11 @@ fig, axes = plt.subplots(2, 3, figsize=(15, 10))
 fig.suptitle(f"CryoET Data: {first_tomo.name}", fontsize=14, fontweight="bold")
 
 # Middle slices
-mid_z, mid_y, mid_x = real_data.shape[0] // 2, real_data.shape[1] // 2, real_data.shape[2] // 2
+mid_z, mid_y, mid_x = (
+    real_data.shape[0] // 2,
+    real_data.shape[1] // 2,
+    real_data.shape[2] // 2,
+)
 
 axes[0, 0].imshow(real_data[mid_z, :, :], cmap="gray")
 axes[0, 0].set_title("XY Slice (middle Z)")
@@ -200,12 +210,16 @@ axes[0, 1].set_title("Read Performance")
 axes[0, 1].set_ylabel("Time (s)")
 axes[0, 1].tick_params(axis="x", rotation=45)
 
-axes[1, 0].bar(methods, [results[m]["compression_ratio"] for m in methods], color="green")
+axes[1, 0].bar(
+    methods, [results[m]["compression_ratio"] for m in methods], color="green"
+)
 axes[1, 0].set_title("Compression Ratio")
 axes[1, 0].set_ylabel("Ratio")
 axes[1, 0].tick_params(axis="x", rotation=45)
 
-axes[1, 1].bar(methods, [results[m]["storage_size_mb"] for m in methods], color="purple")
+axes[1, 1].bar(
+    methods, [results[m]["storage_size_mb"] for m in methods], color="purple"
+)
 axes[1, 1].set_title("Storage Size")
 axes[1, 1].set_ylabel("Size (MB)")
 axes[1, 1].tick_params(axis="x", rotation=45)

@@ -6,14 +6,15 @@ Runtime: ~5-10 seconds
 """
 
 import os
+import pathlib
 import sys
 import time
-import pathlib
+
 import numpy as np
-from test_data_generator import generate_synthetic_volume
 from iohub import open_ome_zarr
+
+from test_data_generator import generate_synthetic_volume
 from zarr_benchmarks import utils
-import zarr
 
 # Enable v3
 os.environ["ZARR_V3_EXPERIMENTAL_API"] = "1"

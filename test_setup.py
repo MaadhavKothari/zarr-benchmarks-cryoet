@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """Quick test script to verify zarr-benchmarks setup"""
 
-import numpy as np
 import pathlib
 import time
-from zarr_benchmarks.read_write_zarr import read_write_zarr
+
+import numpy as np
+
 from zarr_benchmarks import utils
+from zarr_benchmarks.read_write_zarr import read_write_zarr
 
 print("=" * 60)
 print("Testing Zarr Benchmarks Setup")

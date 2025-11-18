@@ -1,14 +1,16 @@
 # 📚 Tutorial: Publishing Zarr-Benchmarks CryoET Extension to GitHub
 
-**Your GitHub:** https://github.com/MaadhavKothari/
-**Repository Name:** `zarr-benchmarks-cryoet` (suggested)
-**Visibility:** Public (recommended for open science)
+**Your GitHub:** <https://github.com/MaadhavKothari/> **Repository Name:**
+`zarr-benchmarks-cryoet` (suggested) **Visibility:** Public (recommended for
+open science)
 
 ---
 
 ## 🎯 What You're Publishing
 
-A complete benchmarking suite for Zarr storage optimization on real CryoET data, including:
+A complete benchmarking suite for Zarr storage optimization on real CryoET data,
+including:
+
 - 3 production-ready scripts
 - 3 Jupyter notebooks
 - 8 comprehensive documentation files
@@ -16,14 +18,16 @@ A complete benchmarking suite for Zarr storage optimization on real CryoET data,
 - CI/CD pipeline
 - Community contribution guidelines
 
-**Impact:** Helps the scientific community optimize data storage, potentially saving thousands of dollars in cloud costs.
+**Impact:** Helps the scientific community optimize data storage, potentially
+saving thousands of dollars in cloud costs.
 
 ---
 
 ## 📋 Prerequisites Checklist
 
 Before starting, make sure you have:
-- [ ] GitHub account (yours: https://github.com/MaadhavKothari/)
+
+- [ ] GitHub account (yours: <https://github.com/MaadhavKothari/>)
 - [ ] Git installed (`git --version`)
 - [ ] GitHub CLI installed (optional but recommended): `brew install gh`
 - [ ] SSH keys set up with GitHub (or use HTTPS)
@@ -120,7 +124,8 @@ data/output/*/
 EOF
 ```
 
-**What this does:** Tells Git to ignore temporary files, virtual environments, and large data files.
+**What this does:** Tells Git to ignore temporary files, virtual environments,
+and large data files.
 
 ---
 
@@ -152,6 +157,7 @@ git status
 **What this does:** Prepares your files to be committed.
 
 **Expected output:**
+
 ```
 Changes to be committed:
   (use "git restore --staged <file>..." to unstage)
@@ -219,17 +225,20 @@ gh repo create zarr-benchmarks-cryoet \
 
 #### Option B: Using GitHub Website
 
-1. **Go to:** https://github.com/new
+1. **Go to:** <https://github.com/new>
 
 2. **Fill in:**
+
    - Repository name: `zarr-benchmarks-cryoet`
-   - Description: `Comprehensive Zarr storage optimization benchmarks for CryoET data - compression, chunking, and sharding analysis`
+   - Description:
+     `Comprehensive Zarr storage optimization benchmarks for CryoET data - compression, chunking, and sharding analysis`
    - Visibility: ☑️ Public
    - DO NOT initialize with README (you already have one)
 
 3. **Click:** "Create repository"
 
 4. **Run these commands:**
+
    ```bash
    # Add GitHub as remote
    git remote add origin https://github.com/MaadhavKothari/zarr-benchmarks-cryoet.git
@@ -239,7 +248,8 @@ gh repo create zarr-benchmarks-cryoet \
    git push -u origin main
    ```
 
-**What this does:** Connects your local repository to GitHub and uploads your code.
+**What this does:** Connects your local repository to GitHub and uploads your
+code.
 
 ---
 
@@ -253,6 +263,7 @@ gh repo view --web
 ```
 
 **Check that you see:**
+
 - [ ] README_CRYOET_EXTENSION.md displayed on homepage
 - [ ] All documentation files visible
 - [ ] Scripts and notebooks present
@@ -262,11 +273,13 @@ gh repo view --web
 
 ### Step 7: Setup GitHub Pages (for documentation)
 
-#### Enable GitHub Pages:
+#### Enable GitHub Pages
 
-1. **Go to:** https://github.com/MaadhavKothari/zarr-benchmarks-cryoet/settings/pages
+1. **Go to:**
+   <https://github.com/MaadhavKothari/zarr-benchmarks-cryoet/settings/pages>
 
 2. **Under "Build and deployment":**
+
    - Source: Deploy from a branch
    - Branch: `main`
    - Folder: `/ (root)`
@@ -278,7 +291,7 @@ gh repo view --web
 
 Your documentation will be live!
 
-#### Create a nice landing page:
+#### Create a nice landing page
 
 ```bash
 # Create docs/index.html (optional but nice)
@@ -307,11 +320,12 @@ git push
 
 ### Step 8: Add Topics/Tags
 
-1. **Go to:** https://github.com/MaadhavKothari/zarr-benchmarks-cryoet
+1. **Go to:** <https://github.com/MaadhavKothari/zarr-benchmarks-cryoet>
 
 2. **Click** the gear icon ⚙️ next to "About"
 
 3. **Add topics:**
+
    - `zarr`
    - `cryoet`
    - `cryo-electron-microscopy`
@@ -358,7 +372,8 @@ git push origin v1.0.0
 ```
 
 **Then on GitHub:**
-1. Go to: https://github.com/MaadhavKothari/zarr-benchmarks-cryoet/releases
+
+1. Go to: <https://github.com/MaadhavKothari/zarr-benchmarks-cryoet/releases>
 2. Click "Draft a new release"
 3. Choose tag: v1.0.0
 4. Title: "v1.0.0 - CryoET Benchmarking Suite"
@@ -374,6 +389,7 @@ git push origin v1.0.0
 2. **Branch name pattern:** `main`
 
 3. **Enable:**
+
    - ☑️ Require pull request before merging
    - ☑️ Require status checks to pass (CI tests)
    - ☑️ Require conversation resolution before merging
@@ -384,11 +400,11 @@ git push origin v1.0.0
 
 ---
 
-## 📢 Step 11: Announce Your Work!
+## 📢 Step 11: Announce Your Work
 
 ### On Zarr Discourse
 
-1. **Go to:** https://zarr.discourse.group/
+1. **Go to:** <https://zarr.discourse.group/>
 2. **Create topic** in "Show and Tell" category
 3. **Use template from** `GITHUB_READY_SUMMARY.md`
 
@@ -458,6 +474,7 @@ git push
 ### Responding to Issues
 
 When someone opens an issue:
+
 1. Respond within 48 hours
 2. Label appropriately (bug, enhancement, question)
 3. If it's a good first issue, add that label
@@ -478,10 +495,15 @@ When someone opens an issue:
 ### GitHub Insights
 
 Check regularly:
-- **Stars:** https://github.com/MaadhavKothari/zarr-benchmarks-cryoet/stargazers
-- **Forks:** https://github.com/MaadhavKothari/zarr-benchmarks-cryoet/network/members
-- **Traffic:** https://github.com/MaadhavKothari/zarr-benchmarks-cryoet/graphs/traffic
-- **Contributors:** https://github.com/MaadhavKothari/zarr-benchmarks-cryoet/graphs/contributors
+
+- **Stars:**
+  <https://github.com/MaadhavKothari/zarr-benchmarks-cryoet/stargazers>
+- **Forks:**
+  <https://github.com/MaadhavKothari/zarr-benchmarks-cryoet/network/members>
+- **Traffic:**
+  <https://github.com/MaadhavKothari/zarr-benchmarks-cryoet/graphs/traffic>
+- **Contributors:**
+  <https://github.com/MaadhavKothari/zarr-benchmarks-cryoet/graphs/contributors>
 
 ### Citations
 
@@ -519,6 +541,7 @@ git push
 ## 🎓 Best Practices for Open Source
 
 ### Do's ✅
+
 - Respond to issues promptly
 - Be welcoming to new contributors
 - Keep documentation up to date
@@ -527,6 +550,7 @@ git push
 - Share your work widely
 
 ### Don'ts ❌
+
 - Don't commit large files (>100MB)
 - Don't commit API keys or secrets
 - Don't force push to main
@@ -578,16 +602,17 @@ git push
 
 ## 📞 Get Help
 
-- **GitHub Docs:** https://docs.github.com/
-- **Git Tutorial:** https://git-scm.com/book/en/v2
-- **GitHub CLI:** https://cli.github.com/manual/
-- **Zarr Community:** https://zarr.discourse.group/
+- **GitHub Docs:** <https://docs.github.com/>
+- **Git Tutorial:** <https://git-scm.com/book/en/v2>
+- **GitHub CLI:** <https://cli.github.com/manual/>
+- **Zarr Community:** <https://zarr.discourse.group/>
 
 ---
 
 ## ✅ Post-Publishing Checklist
 
 After publishing, verify:
+
 - [ ] Repository is public
 - [ ] README displays correctly
 - [ ] All documentation accessible
@@ -601,9 +626,10 @@ After publishing, verify:
 
 ---
 
-## 🎉 Congratulations!
+## 🎉 Congratulations
 
 Your work is now:
+
 - ✅ Publicly available
 - ✅ Professionally documented
 - ✅ Ready for collaboration

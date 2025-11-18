@@ -1,6 +1,7 @@
 # Zarr Chunking & Sharding: Technical Verification
 
-**Confirmation:** All chunking and sharding metrics in our benchmarks are **100% Zarr-specific features**.
+**Confirmation:** All chunking and sharding metrics in our benchmarks are **100%
+Zarr-specific features**.
 
 ---
 
@@ -9,12 +10,14 @@
 ### 1. Chunking is a Core Zarr Feature
 
 **From Zarr Specification:**
+
 - Zarr stores N-dimensional arrays as **chunks** (sub-arrays)
 - Each chunk is independently compressed and stored
 - Chunk shape is defined in the `.zarray` metadata file
 - This is **not** a general storage concept - it's Zarr-specific
 
 **From Our Benchmarks:**
+
 ```json
 // data/output/chunking_benchmarks/chunks_64.zarr/.zarray
 {
@@ -28,6 +31,7 @@
 ```
 
 **File Structure:**
+
 ```
 chunks_64.zarr/
 ├── .zarray              ← Zarr metadata (JSON)
@@ -44,12 +48,14 @@ Each numbered file is a **Zarr chunk** - compressed using Blosc-Zstd.
 ### 2. Sharding is a Zarr v3 Extension
 
 **From Zarr v3 Specification (ZEP 2):**
+
 - Sharding is a **codec** in Zarr v3
 - Allows multiple chunks to be stored in a single "shard" file
 - Defined in the Zarr Enhancement Proposal (ZEP) 002
-- URL: https://zarr.dev/zeps/accepted/ZEP0002.html
+- URL: <https://zarr.dev/zeps/accepted/ZEP0002.html>
 
 **Not tested in our benchmarks because:**
+
 ```python
 # Current environment
 import zarr
@@ -63,6 +69,7 @@ print(zarr.__version__)  # 2.18.7
 ```
 
 **Zarr v3 Sharding API:**
+
 ```python
 from zarr.codecs import ShardingCodec, BloscCodec, BytesCodec
 
@@ -84,7 +91,8 @@ zarr.create_array(
 )
 ```
 
-**Result:** Multiple 32³ chunks stored in one 128³ shard file - pure Zarr v3 feature.
+**Result:** Multiple 32³ chunks stored in one 128³ shard file - pure Zarr v3
+feature.
 
 ---
 
@@ -93,18 +101,28 @@ zarr.create_array(
 ### Official Zarr Chunking Documentation
 
 **Zarr v2 Chunking:**
-- Docs: https://zarr.readthedocs.io/en/stable/tutorial.html#chunk-optimizations
-- Spec: https://zarr-specs.readthedocs.io/en/latest/v2/v2.0.html
+
+- Docs:
+  <https://zarr.readthedocs.io/en/stable/tutorial.html#chunk-optimizations>
+- Spec: <https://zarr-specs.readthedocs.io/en/latest/v2/v2.0.html>
 
 **Key Quote:**
-> "Zarr divides array data into chunks, where each chunk is compressed and stored as a separate binary file. The shape of the chunks can be chosen to match the expected access pattern."
+
+> "Zarr divides array data into chunks, where each chunk is compressed and
+> stored as a separate binary file. The shape of the chunks can be chosen to
+> match the expected access pattern."
 
 **Zarr v3 Sharding:**
-- Docs: https://zarr.readthedocs.io/en/v3.0.0/user-guide/performance.html#sharding
-- ZEP: https://zarr.dev/zeps/accepted/ZEP0002.html
+
+- Docs:
+  <https://zarr.readthedocs.io/en/v3.0.0/user-guide/performance.html#sharding>
+- ZEP: <https://zarr.dev/zeps/accepted/ZEP0002.html>
 
 **Key Quote:**
-> "Sharding allows multiple chunks to be stored within a single file (shard), significantly reducing the number of files for large arrays while maintaining fine-grained access patterns."
+
+> "Sharding allows multiple chunks to be stored within a single file (shard),
+> significantly reducing the number of files for large arrays while maintaining
+> fine-grained access patterns."
 
 ---
 
@@ -113,6 +131,7 @@ zarr.create_array(
 ### Zarr-Specific Operations
 
 **1. Zarr Array Creation:**
+
 ```python
 zarr.open_array(
     'data.zarr',
@@ -124,16 +143,19 @@ zarr.open_array(
 ```
 
 **2. Zarr Chunk Storage:**
+
 - Each chunk stored as separate file in Zarr format
 - File naming: `{z}.{y}.{x}` (Zarr v2 convention)
 - Compression applied per-chunk (Zarr behavior)
 
 **3. Zarr Metadata:**
+
 - `.zarray` file: JSON metadata (Zarr-specific)
 - Contains `chunks`, `shape`, `dtype`, `compressor`
 - Follows Zarr v2 specification exactly
 
 **4. Zarr Read Operations:**
+
 ```python
 z = zarr.open_array('data.zarr', 'r')
 data = z[:]           # Read full array
@@ -147,22 +169,26 @@ chunk = z[0:64, :, :] # Read specific chunks (Zarr figures out which chunks to r
 ### Without Chunking (Non-Zarr Formats)
 
 **HDF5 Example:**
+
 - Can have chunks, but different API and behavior
 - Less flexible chunk shapes
 - Compression applied differently
 
 **NumPy .npy Files:**
+
 - No chunking - monolithic binary
 - Must read entire array always
 - No compression
 
 **Raw Binary:**
+
 - No structure, no chunks
 - Linear byte stream
 
 ### With Zarr Chunking
 
 **Our Benchmark Results:**
+
 ```
 128³ volume = 8 MB raw
 
@@ -183,6 +209,7 @@ With 128³ Zarr chunks:
 ```
 
 **Trade-off is Zarr-specific:** Balancing chunk size affects:
+
 1. Number of Zarr chunk files
 2. Zarr read performance
 3. Zarr write performance
@@ -195,11 +222,13 @@ With 128³ Zarr chunks:
 ### The Problem (Zarr v2)
 
 In Zarr v2:
+
 ```
 1 chunk = 1 file (mandatory)
 ```
 
 This means:
+
 - Small chunks → Many files (bad for S3)
 - Large chunks → Wasteful reads (bad for slicing)
 - **No way to decouple these!**
@@ -207,6 +236,7 @@ This means:
 ### The Solution (Zarr v3)
 
 Zarr v3 introduces **ShardingCodec**:
+
 ```python
 # Zarr v3 API
 from zarr.codecs import ShardingCodec
@@ -223,6 +253,7 @@ ShardingCodec(
 ```
 
 **File Structure:**
+
 ```
 data.zarr/
 ├── zarr.json           ← Zarr v3 metadata (not v2's .zarray)
@@ -230,6 +261,7 @@ data.zarr/
 ```
 
 **Inside the shard file:**
+
 ```
 c0.0.0:
   [chunk 0.0.0: compressed data]
@@ -241,6 +273,7 @@ c0.0.0:
 ```
 
 **Benefits:**
+
 1. Read granularity: 32³ = 128 KB (fine-grained)
 2. File count: 1 file (efficient storage)
 3. **Best of both worlds!**
@@ -249,13 +282,14 @@ c0.0.0:
 
 **Scenario:** 630×630×184 tomogram with Zarr v3 sharding
 
-| Configuration | Files | Read Granularity | Performance |
-|---------------|-------|------------------|-------------|
-| **v2: 16³ chunks** | 18,000 | 16³ = 16 KB | Too many files |
-| **v2: 128³ chunks** | 40 | 128³ = 8 MB | Wasteful reads |
-| **v3: 32³ chunks, 128³ shards** | ~40 | 32³ = 128 KB | Perfect! |
+| Configuration                   | Files  | Read Granularity | Performance    |
+| ------------------------------- | ------ | ---------------- | -------------- |
+| **v2: 16³ chunks**              | 18,000 | 16³ = 16 KB      | Too many files |
+| **v2: 128³ chunks**             | 40     | 128³ = 8 MB      | Wasteful reads |
+| **v3: 32³ chunks, 128³ shards** | ~40    | 32³ = 128 KB     | Perfect!       |
 
-**Reduction:** 99.8% fewer files vs small chunks, with 64× finer read granularity!
+**Reduction:** 99.8% fewer files vs small chunks, with 64× finer read
+granularity!
 
 ---
 
@@ -290,6 +324,7 @@ compression_ratio = data.nbytes / (storage_size * 1024**2)
 ```
 
 **From output files:**
+
 ```bash
 $ cat data/output/chunking_benchmarks/chunks_64.zarr/.zarray
 {
@@ -303,6 +338,7 @@ $ cat data/output/chunking_benchmarks/chunks_64.zarr/.zarray
 ```
 
 **File structure:**
+
 ```bash
 $ tree chunks_64.zarr/
 chunks_64.zarr/
@@ -328,6 +364,7 @@ chunks_64.zarr/
 ### HDF5 (Similar but Different)
 
 **HDF5 has chunking too, but:**
+
 ```python
 import h5py
 
@@ -342,6 +379,7 @@ dset = f.create_dataset(
 ```
 
 **Differences:**
+
 - HDF5 chunks stored **inside** single .h5 file
 - Zarr chunks stored as **separate files**
 - HDF5: B-tree index, Zarr: directory structure
@@ -353,6 +391,7 @@ dset = f.create_dataset(
 ### TensorFlow TFRecord
 
 **No chunking concept:**
+
 - Sequential protobuf messages
 - No random access to subregions
 - Must read entire shard
@@ -369,9 +408,10 @@ dset = f.create_dataset(
 
 ## 🎓 Summary: Confirmation
 
-### Yes, Everything is Zarr-Specific!
+### Yes, Everything is Zarr-Specific
 
 **What we benchmarked:**
+
 - ✅ **Zarr chunking** (v2 format)
 - ✅ **Zarr compression** (via Blosc codec)
 - ✅ **Zarr storage** (DirectoryStore)
@@ -379,12 +419,14 @@ dset = f.create_dataset(
 - ✅ **Zarr v3 sharding** (documented, but not runnable in our env)
 
 **What we measured:**
+
 - ✅ **Zarr chunk count** (files per array)
 - ✅ **Zarr read performance** (zarr.open_array)
 - ✅ **Zarr write performance** (zarr[:] = data)
 - ✅ **Zarr compression ratio** (zarr compressor efficiency)
 
 **What we recommend:**
+
 - ✅ **Zarr v2 best practices** (64³ chunks for balance)
 - ✅ **Zarr v3 migration path** (sharding for cloud)
 - ✅ **Zarr-specific optimizations** (non-cubic chunks for slicing)
@@ -395,23 +437,25 @@ dset = f.create_dataset(
 
 ### Official Zarr Resources
 
-1. **Zarr Tutorial:** https://zarr.readthedocs.io/en/stable/tutorial.html
-2. **Zarr v2 Spec:** https://zarr-specs.readthedocs.io/en/latest/v2/v2.0.html
-3. **Zarr v3 Spec:** https://zarr-specs.readthedocs.io/en/latest/v3/core/v3.0.html
-4. **Sharding ZEP:** https://zarr.dev/zeps/accepted/ZEP0002.html
-5. **Zarr Python Docs:** https://zarr.readthedocs.io/
+1. **Zarr Tutorial:** <https://zarr.readthedocs.io/en/stable/tutorial.html>
+2. **Zarr v2 Spec:** <https://zarr-specs.readthedocs.io/en/latest/v2/v2.0.html>
+3. **Zarr v3 Spec:**
+   <https://zarr-specs.readthedocs.io/en/latest/v3/core/v3.0.html>
+4. **Sharding ZEP:** <https://zarr.dev/zeps/accepted/ZEP0002.html>
+5. **Zarr Python Docs:** <https://zarr.readthedocs.io/>
 
 ### Community Resources
 
-1. **Zarr Discourse:** https://zarr.discourse.group/
-2. **GitHub Discussions:** https://github.com/zarr-developers/zarr-python/discussions
-3. **HEFTIE Benchmarks:** https://github.com/HEFTIEProject/zarr-benchmarks
+1. **Zarr Discourse:** <https://zarr.discourse.group/>
+2. **GitHub Discussions:**
+   <https://github.com/zarr-developers/zarr-python/discussions>
+3. **HEFTIE Benchmarks:** <https://github.com/HEFTIEProject/zarr-benchmarks>
 
 ### Related Standards
 
-1. **OME-Zarr (bioimaging):** https://ngff.openmicroscopy.org/
-2. **Zarr for neuroimaging:** https://github.com/zarr-developers/zarr-specs
-3. **Cloud-Optimized Zarr:** https://github.com/zarr-developers/zarr-python
+1. **OME-Zarr (bioimaging):** <https://ngff.openmicroscopy.org/>
+2. **Zarr for neuroimaging:** <https://github.com/zarr-developers/zarr-specs>
+3. **Cloud-Optimized Zarr:** <https://github.com/zarr-developers/zarr-python>
 
 ---
 
@@ -425,13 +469,12 @@ dset = f.create_dataset(
 - **Metadata:** Zarr .zarray format
 - **Storage:** Zarr store abstraction
 
-**Our benchmarks measure Zarr's performance with different chunk configurations, using the official zarr-python library, following Zarr specifications exactly.**
+**Our benchmarks measure Zarr's performance with different chunk configurations,
+using the official zarr-python library, following Zarr specifications exactly.**
 
 **No ambiguity - this is 100% Zarr!** 🎯
 
 ---
 
-**Document Version:** 1.0
-**Date:** November 12, 2025
-**Zarr Version Tested:** 2.18.7
-**Zarr Version Documented (Sharding):** 3.0.0+
+**Document Version:** 1.0 **Date:** November 12, 2025 **Zarr Version Tested:**
+2.18.7 **Zarr Version Documented (Sharding):** 3.0.0+

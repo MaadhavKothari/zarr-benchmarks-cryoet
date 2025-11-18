@@ -1,6 +1,7 @@
 # Zarr Benchmarks: CryoET Extension
 
-**Extended benchmarks for real CryoET data with compression, chunking, and sharding analysis**
+**Extended benchmarks for real CryoET data with compression, chunking, and
+sharding analysis**
 
 [![Python 3.13](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/downloads/)
 [![Zarr](https://img.shields.io/badge/zarr-2.18.7-green.svg)](https://zarr.dev/)
@@ -10,37 +11,47 @@
 
 ## 🎯 What's New: CryoET Real Data Benchmarks
 
-This repository extends the [HEFTIE zarr-benchmarks](https://github.com/HEFTIEProject/zarr-benchmarks) project with **comprehensive benchmarks on real cryo-electron tomography (CryoET) data** from the [CryoET Data Portal](https://cryoetdataportal.czscience.com/).
+This repository extends the
+[HEFTIE zarr-benchmarks](https://github.com/HEFTIEProject/zarr-benchmarks)
+project with **comprehensive benchmarks on real cryo-electron tomography
+(CryoET) data** from the
+[CryoET Data Portal](https://cryoetdataportal.czscience.com/).
 
 ### Key Additions
 
 1. **✅ Real CryoET Data Integration**
+
    - Downloads actual tomograms from CryoET Portal via API
    - Tests on normalized float32 scientific data (not synthetic)
    - Validates HEFTIE recommendations on production data
 
 2. **✅ Comprehensive Compression Analysis**
+
    - Benchmarked: Blosc-Zstd, Blosc-LZ4, Zstd, GZip, No compression
    - Finding: **Blosc-Zstd achieves 1.17× compression (14.4% savings)**
    - Recommendation: Level 5 for archival, Level 3 for active use
 
 3. **✅ Chunking Strategy Optimization**
+
    - Tested: 16³, 32³, 64³, 128³ cubic chunks
    - Tested: Non-cubic configs optimized for slice viewing
    - Finding: **File count reduction of 99.6%** (16³ → 128³)
    - Recommendation: 64³ for balance, (16,128,128) for visualization
 
 4. **✅ Zarr v3 Sharding Preparation**
+
    - Documented sharding benefits (90-99% file reduction)
    - Prepared benchmark scripts for v3 testing
    - Roadmap for v3 migration when ecosystem ready
 
 5. **✅ Image Quality Validation**
+
    - SSIM, PSNR, MSE metrics integrated
    - Confirms lossless compression integrity
    - Ready for lossy compression exploration (ZFP, SZ3)
 
 6. **✅ Zarr v2 vs v3 Comparison** 🆕
+
    - Direct performance comparison between versions
    - File count and storage efficiency analysis
    - Compatibility and ecosystem considerations
@@ -56,32 +67,32 @@ This repository extends the [HEFTIE zarr-benchmarks](https://github.com/HEFTIEPr
 
 ### Compression Benchmark (128³ CryoET Volume)
 
-| Method | Write | Read | Compression | Size | Savings |
-|--------|-------|------|-------------|------|---------|
-| **Blosc-Zstd** | 13ms | 4ms | **1.17×** | **6.85 MB** | **14.4%** |
-| Blosc-LZ4 | 9ms | 5ms | 1.09× | 7.31 MB | 8.6% |
-| Zstd | 5ms | 3ms | 1.08× | 7.41 MB | 7.4% |
-| No Compression | 3ms | 2ms | 1.00× | 8.00 MB | 0% |
+| Method         | Write | Read | Compression | Size        | Savings   |
+| -------------- | ----- | ---- | ----------- | ----------- | --------- |
+| **Blosc-Zstd** | 13ms  | 4ms  | **1.17×**   | **6.85 MB** | **14.4%** |
+| Blosc-LZ4      | 9ms   | 5ms  | 1.09×       | 7.31 MB     | 8.6%      |
+| Zstd           | 5ms   | 3ms  | 1.08×       | 7.41 MB     | 7.4%      |
+| No Compression | 3ms   | 2ms  | 1.00×       | 8.00 MB     | 0%        |
 
 **Winner:** Blosc-Zstd (best compression, excellent I/O performance)
 
 ### Chunking Benchmark (128³ CryoET Volume)
 
-| Chunk Size | Files | Write | Full Read | Slice Read |
-|------------|-------|-------|-----------|------------|
-| 16³ | **513** | 229ms | 39ms | 3.6ms |
-| 32³ | 65 | 75ms | 12ms | 2.4ms |
-| 64³ | **9** | **24ms** | **4.5ms** | **1.7ms** |
-| 128³ | 2 | 12ms | 1.9ms | 1.7ms |
+| Chunk Size | Files   | Write    | Full Read | Slice Read |
+| ---------- | ------- | -------- | --------- | ---------- |
+| 16³        | **513** | 229ms    | 39ms      | 3.6ms      |
+| 32³        | 65      | 75ms     | 12ms      | 2.4ms      |
+| 64³        | **9**   | **24ms** | **4.5ms** | **1.7ms**  |
+| 128³       | 2       | 12ms     | 1.9ms     | 1.7ms      |
 
 **Winner:** 64³ (balance) or 128³ (cloud storage)
 
 ### Non-Cubic Optimization
 
-| Config | Shape | Files | Slice Read | Use Case |
-|--------|-------|-------|------------|----------|
-| **Slice-optimized** | (16,128,128) | 9 | **0.4ms** | Napari, viewers |
-| Standard cubic | (64,64,64) | 9 | 1.7ms | General |
+| Config              | Shape        | Files | Slice Read | Use Case        |
+| ------------------- | ------------ | ----- | ---------- | --------------- |
+| **Slice-optimized** | (16,128,128) | 9     | **0.4ms**  | Napari, viewers |
+| Standard cubic      | (64,64,64)   | 9     | 1.7ms      | General         |
 
 **4× faster slice viewing** with optimized chunks!
 
@@ -197,26 +208,34 @@ zarr-benchmarks/
 ## 📚 Documentation Guide
 
 ### For Quick Start Users
+
 **Start here:** `CRYOET_RESULTS.md`
+
 - How to run benchmarks
 - Understanding results
 - Using your own data
 
 ### For Scientists & Engineers
+
 **Read:** `EXECUTIVE_SUMMARY.md`
+
 - Key findings (1-page)
 - Recommendations by use case
 - ROI analysis
 
 ### For Technical Deep Dive
+
 **Read:** `TECHNICAL_REPORT.md` + `CHUNKING_SHARDING_REPORT.md`
+
 - Complete methodology
 - Statistical analysis
 - Performance scaling
 - Zarr v3 sharding explanation
 
 ### For Verification
+
 **Read:** `ZARR_CHUNKING_SHARDING_EXPLAINED.md`
+
 - Confirms all metrics are Zarr-specific
 - Links to Zarr specifications
 - API documentation
@@ -226,31 +245,39 @@ zarr-benchmarks/
 ## 🎯 Use Case Recommendations
 
 ### For Interactive Visualization (Napari, IMOD, Web Viewers)
+
 ```python
 chunks = (16, 128, 128)  # Thin in Z, wide in XY
 compressor = Blosc(cname='lz4', clevel=3, shuffle=Blosc.SHUFFLE)
 ```
+
 **Why:** 4× faster slice viewing, matches user interaction pattern
 
 ### For General CryoET Analysis
+
 ```python
 chunks = (64, 64, 64)
 compressor = Blosc(cname='zstd', clevel=5, shuffle=Blosc.SHUFFLE)
 ```
+
 **Why:** Best balance of performance, file count, and compression
 
 ### For Cloud Storage (S3, GCS, Azure)
+
 ```python
 chunks = (128, 128, 128)  # Or larger
 compressor = Blosc(cname='zstd', clevel=5, shuffle=Blosc.SHUFFLE)
 ```
+
 **Why:** Minimal file count (99.6% reduction), lower API costs
 
 ### For Archival Storage
+
 ```python
 chunks = (128, 128, 128)
 compressor = Blosc(cname='zstd', clevel=7, shuffle=Blosc.SHUFFLE)
 ```
+
 **Why:** Maximum compression, infrequent access acceptable
 
 ---
@@ -258,6 +285,7 @@ compressor = Blosc(cname='zstd', clevel=7, shuffle=Blosc.SHUFFLE)
 ## 🔬 Scientific Impact
 
 ### Validated on Real Data
+
 - **Dataset:** CryoET Portal Dataset 10445
 - **Format:** OME-Zarr multi-resolution pyramids
 - **Size:** 128³ - 512³ test volumes
@@ -266,16 +294,19 @@ compressor = Blosc(cname='zstd', clevel=7, shuffle=Blosc.SHUFFLE)
 ### Key Contributions
 
 1. **Confirms HEFTIE recommendations** on real scientific data
+
    - Blosc-Zstd is indeed optimal for image data
    - Level 3-5 provides best balance
    - Shuffle filter improves compression by 8%
 
 2. **Quantifies CryoET-specific behavior**
+
    - Normalized data compresses modestly (1.1-1.2×)
    - Differs from raw microscopy (2-5× typical)
    - Sets realistic expectations for similar datasets
 
 3. **Demonstrates chunking impact**
+
    - 99.6% file reduction possible
    - Translates to $1,000+/year savings at scale
    - Non-cubic chunks unlock 4× slice performance
@@ -292,18 +323,21 @@ compressor = Blosc(cname='zstd', clevel=7, shuffle=Blosc.SHUFFLE)
 We welcome contributions! Areas of interest:
 
 ### Immediate Needs
+
 - [ ] Test on more diverse CryoET datasets
 - [ ] Validate on larger volumes (512³+)
 - [ ] Add tensorstore backend benchmarks
 - [ ] Test lossy compression (ZFP, SZ3)
 
 ### Medium-term Goals
+
 - [ ] Zarr v3 sharding benchmarks (when vizarr supports it)
 - [ ] Multi-resolution pyramid optimization
 - [ ] Cloud storage backend comparison (S3, GCS, Azure)
 - [ ] Dask integration for parallel processing
 
 ### Long-term Vision
+
 - [ ] Interactive benchmark web tool
 - [ ] Automated recommendation engine
 - [ ] CI/CD for continuous benchmarking
@@ -318,16 +352,21 @@ We welcome contributions! Areas of interest:
 ## 📊 Example Outputs
 
 ### Compression Benchmark Plot
+
 ![Compression Results](data/output/cryoet_benchmarks/cryoet_benchmark.png)
 
-4-panel comparison showing write/read performance, compression ratio, and storage size.
+4-panel comparison showing write/read performance, compression ratio, and
+storage size.
 
 ### Chunking Benchmark Plot
+
 ![Chunking Results](data/output/chunking_benchmarks/chunking_comparison.png)
 
-6-panel analysis showing file count reduction, performance trade-offs, and efficiency.
+6-panel analysis showing file count reduction, performance trade-offs, and
+efficiency.
 
 ### Data Visualization
+
 ![CryoET Data](data/output/cryoet_viz/cryoet_quick_viz.png)
 
 Orthogonal slices, intensity distribution, and statistics from real tomogram.
@@ -337,6 +376,7 @@ Orthogonal slices, intensity distribution, and statistics from real tomogram.
 ## 🛠️ Technical Details
 
 ### Environment
+
 - **Python:** 3.13
 - **Zarr:** 2.18.7 (v2 for vizarr compatibility)
 - **NumCodecs:** Latest (Blosc, Zstd)
@@ -344,6 +384,7 @@ Orthogonal slices, intensity distribution, and statistics from real tomogram.
 - **Storage:** Local filesystem + S3 (anonymous read)
 
 ### Tested Configurations
+
 - **Codecs:** 6 (Blosc-Zstd, Blosc-LZ4, Blosc-Zlib, Zstd, GZip, None)
 - **Shuffles:** 3 (shuffle, bitshuffle, noshuffle)
 - **Levels:** 5 (1, 3, 5, 7, 9)
@@ -351,6 +392,7 @@ Orthogonal slices, intensity distribution, and statistics from real tomogram.
 - **Total:** ~100 unique configurations tested
 
 ### Hardware Used
+
 - **CPU:** Apple Silicon / x86_64
 - **RAM:** 16+ GB recommended
 - **Storage:** SSD recommended for benchmarks
@@ -361,16 +403,20 @@ Orthogonal slices, intensity distribution, and statistics from real tomogram.
 ## 📖 Related Work
 
 ### Builds Upon
-- **HEFTIE Project:** https://github.com/HEFTIEProject/zarr-benchmarks
-- **Zarr Specification:** https://zarr.dev/
-- **CryoET Data Portal:** https://cryoetdataportal.czscience.com/
+
+- **HEFTIE Project:** <https://github.com/HEFTIEProject/zarr-benchmarks>
+- **Zarr Specification:** <https://zarr.dev/>
+- **CryoET Data Portal:** <https://cryoetdataportal.czscience.com/>
 
 ### Complements
-- **OME-Zarr:** https://ngff.openmicroscopy.org/
-- **Zarr v3 Sharding ZEP:** https://zarr.dev/zeps/accepted/ZEP0002.html
-- **NASA Zarr Visualization Report:** https://nasa-impact.github.io/zarr-visualization-report/
+
+- **OME-Zarr:** <https://ngff.openmicroscopy.org/>
+- **Zarr v3 Sharding ZEP:** <https://zarr.dev/zeps/accepted/ZEP0002.html>
+- **NASA Zarr Visualization Report:**
+  <https://nasa-impact.github.io/zarr-visualization-report/>
 
 ### Inspires
+
 - Similar benchmarks for other domains (climate, genomics, astronomy)
 - Optimal compression strategies for normalized scientific data
 - Chunk size selection for interactive workflows
@@ -380,11 +426,13 @@ Orthogonal slices, intensity distribution, and statistics from real tomogram.
 ## 🙏 Acknowledgments
 
 ### Data Sources
+
 - **CryoET Data Portal** for public tomogram access
 - **Chan Zuckerberg Initiative** for CZII dataset 10445
 - **HEFTIE Project** for benchmark framework
 
 ### Tools & Libraries
+
 - **Zarr Developers** for zarr-python
 - **Blosc Developers** for fast compression
 - **NumCodecs** for codec registry
@@ -402,16 +450,19 @@ This extension follows the original HEFTIE project license.
 
 ## 📞 Contact & Support
 
-### For CryoET-specific questions:
+### For CryoET-specific questions
+
 - Open an issue on GitHub
 - Tag: `cryoet`, `benchmarks`, `zarr`
 
-### For general HEFTIE questions:
+### For general HEFTIE questions
+
 - See original HEFTIE repository
 - HEFTIE project documentation
 
-### For Zarr questions:
-- Zarr Discourse: https://zarr.discourse.group/
+### For Zarr questions
+
+- Zarr Discourse: <https://zarr.discourse.group/>
 - Zarr GitHub Discussions
 
 ---
@@ -419,21 +470,25 @@ This extension follows the original HEFTIE project license.
 ## 🗺️ Future Roadmap
 
 ### Q1 2026: Zarr v3 Migration
+
 - [ ] Test sharding on real CryoET data
 - [ ] Compare v2 vs v3 performance
 - [ ] Migration guide for repositories
 
 ### Q2 2026: Scale Testing
+
 - [ ] Benchmark full tomograms (500MB - 5GB)
 - [ ] Test on 100+ diverse datasets
 - [ ] Cloud storage backend comparison
 
 ### Q3 2026: Lossy Compression
+
 - [ ] Evaluate ZFP, SZ3, JPEG2000
 - [ ] Quality metrics (SSIM, PSNR)
 - [ ] Application-specific thresholds
 
 ### Q4 2026: Production Tools
+
 - [ ] Interactive recommendation web app
 - [ ] Automated benchmark CLI tool
 - [ ] CI/CD integration templates
@@ -444,13 +499,10 @@ This extension follows the original HEFTIE project license.
 
 ## 📈 Project Status
 
-✅ **Compression benchmarks** - Complete
-✅ **Chunking benchmarks** - Complete
-✅ **Documentation** - Complete
-✅ **Notebooks** - Complete
-⏳ **Zarr v3 sharding** - Waiting for ecosystem
-⏳ **Lossy compression** - Future work
-⏳ **Web tool** - Future work
+✅ **Compression benchmarks** - Complete ✅ **Chunking benchmarks** - Complete
+✅ **Documentation** - Complete ✅ **Notebooks** - Complete ⏳ **Zarr v3
+sharding** - Waiting for ecosystem ⏳ **Lossy compression** - Future work ⏳
+**Web tool** - Future work
 
 ---
 
@@ -471,4 +523,5 @@ This extension follows the original HEFTIE project license.
 
 **Happy benchmarking! 🚀**
 
-*For questions, issues, or contributions, please open a GitHub issue or pull request.*
+_For questions, issues, or contributions, please open a GitHub issue or pull
+request._

@@ -4,16 +4,18 @@ CryoET Real Data Benchmark with Visualization
 Download, visualize, and benchmark real cryo-EM tomography data from the CryoET portal
 """
 
-import numpy as np
 import pathlib
 import time
-import pandas as pd
+
 import matplotlib.pyplot as plt
-from cryoet_data_portal import Client, Dataset
+import numpy as np
+import pandas as pd
 import s3fs
 import zarr
-from zarr_benchmarks.read_write_zarr import read_write_zarr
+from cryoet_data_portal import Client, Dataset
+
 from zarr_benchmarks import utils
+from zarr_benchmarks.read_write_zarr import read_write_zarr
 
 print("=" * 70)
 print("CRYOET REAL DATA BENCHMARK WITH VISUALIZATION")
@@ -58,7 +60,7 @@ zarr_array = zarr_group["0"]  # Full resolution data
 print(f"   ✓ Shape: {zarr_array.shape} (Z, Y, X)")
 print(f"   ✓ Dtype: {zarr_array.dtype}")
 print(f"   ✓ Chunks: {zarr_array.chunks}")
-print(f"   ✓ Original compressor: Blosc(lz4)")
+print("   ✓ Original compressor: Blosc(lz4)")
 print(f"   ✓ Size: {zarr_array.nbytes / (1024**3):.2f} GB (uncompressed)")
 
 # ============================================================================
@@ -104,31 +106,45 @@ print("\n📸 5. Visualizing the cryo-EM tomogram data...")
 
 fig = plt.figure(figsize=(16, 12))
 fig.suptitle(
-    f"CryoET Data: {first_tomo.name} (Dataset {dataset.id})", fontsize=16, fontweight="bold"
+    f"CryoET Data: {first_tomo.name} (Dataset {dataset.id})",
+    fontsize=16,
+    fontweight="bold",
 )
 
 # XY slices at different Z positions
-for i, z_pos in enumerate([actual_shape[0] // 4, actual_shape[0] // 2, 3 * actual_shape[0] // 4]):
+for i, z_pos in enumerate(
+    [actual_shape[0] // 4, actual_shape[0] // 2, 3 * actual_shape[0] // 4]
+):
     ax = plt.subplot(3, 3, i + 1)
-    im = ax.imshow(real_data[z_pos, :, :], cmap="gray", vmin=real_data.min(), vmax=real_data.max())
+    im = ax.imshow(
+        real_data[z_pos, :, :], cmap="gray", vmin=real_data.min(), vmax=real_data.max()
+    )
     ax.set_title(f"XY Slice (Z={z_pos})")
     ax.set_xlabel("X")
     ax.set_ylabel("Y")
     plt.colorbar(im, ax=ax, fraction=0.046)
 
 # XZ slices at different Y positions
-for i, y_pos in enumerate([actual_shape[1] // 4, actual_shape[1] // 2, 3 * actual_shape[1] // 4]):
+for i, y_pos in enumerate(
+    [actual_shape[1] // 4, actual_shape[1] // 2, 3 * actual_shape[1] // 4]
+):
     ax = plt.subplot(3, 3, i + 4)
-    im = ax.imshow(real_data[:, y_pos, :], cmap="gray", vmin=real_data.min(), vmax=real_data.max())
+    im = ax.imshow(
+        real_data[:, y_pos, :], cmap="gray", vmin=real_data.min(), vmax=real_data.max()
+    )
     ax.set_title(f"XZ Slice (Y={y_pos})")
     ax.set_xlabel("X")
     ax.set_ylabel("Z")
     plt.colorbar(im, ax=ax, fraction=0.046)
 
 # YZ slices at different X positions
-for i, x_pos in enumerate([actual_shape[2] // 4, actual_shape[2] // 2, 3 * actual_shape[2] // 4]):
+for i, x_pos in enumerate(
+    [actual_shape[2] // 4, actual_shape[2] // 2, 3 * actual_shape[2] // 4]
+):
     ax = plt.subplot(3, 3, i + 7)
-    im = ax.imshow(real_data[:, :, x_pos], cmap="gray", vmin=real_data.min(), vmax=real_data.max())
+    im = ax.imshow(
+        real_data[:, :, x_pos], cmap="gray", vmin=real_data.min(), vmax=real_data.max()
+    )
     ax.set_title(f"YZ Slice (X={x_pos})")
     ax.set_xlabel("Y")
     ax.set_ylabel("Z")
@@ -151,7 +167,9 @@ print("\n📊 6. Analyzing data distribution...")
 fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 
 # Histogram
-axes[0].hist(real_data.flatten(), bins=100, color="steelblue", alpha=0.7, edgecolor="black")
+axes[0].hist(
+    real_data.flatten(), bins=100, color="steelblue", alpha=0.7, edgecolor="black"
+)
 axes[0].set_xlabel("Voxel Intensity")
 axes[0].set_ylabel("Frequency")
 axes[0].set_title(f"CryoET Data Distribution\n{first_tomo.name}")
@@ -255,7 +273,12 @@ print("=" * 70)
 
 summary_df = pd.DataFrame(results).T
 summary_df = summary_df.round(3)
-summary_df.columns = ["Write Time (s)", "Read Time (s)", "Compression Ratio", "Storage Size (MB)"]
+summary_df.columns = [
+    "Write Time (s)",
+    "Read Time (s)",
+    "Compression Ratio",
+    "Storage Size (MB)",
+]
 
 print("\n" + summary_df.to_string())
 
@@ -316,20 +339,20 @@ print("\n" + "=" * 70)
 print("✅ CRYOET DATA BENCHMARK COMPLETED!")
 print("=" * 70)
 
-print(f"\nDataset Information:")
+print("\nDataset Information:")
 print(f"  - Dataset: {dataset.title}")
 print(f"  - Tomogram: {first_tomo.name}")
 print(f"  - Full size: {first_tomo.size_x} x {first_tomo.size_y} x {first_tomo.size_z}")
 print(f"  - Benchmarked subset: {actual_shape}")
 print(f"  - Voxel spacing: {first_tomo.voxel_spacing} Å")
-print(f"  - Original compression: Blosc(lz4)")
+print("  - Original compression: Blosc(lz4)")
 
-print(f"\nFiles saved:")
+print("\nFiles saved:")
 print(f"  - Visualizations: {viz_dir}/")
 print(f"  - Benchmark data: {output_dir}/")
 print(f"  - Comparison plot: {plot_path}")
 
-print(f"\n💡 Key Findings:")
+print("\n💡 Key Findings:")
 original_size = real_data.nbytes / (1024**2)
 best_method = summary_df["Compression Ratio"].idxmax()
 best_ratio = summary_df.loc[best_method, "Compression Ratio"]
@@ -339,4 +362,4 @@ savings = original_size - best_size
 print(f"  - Original size: {original_size:.2f} MB")
 print(f"  - Best compression: {best_method} ({best_ratio:.2f}x)")
 print(f"  - Compressed size: {best_size:.2f} MB")
-print(f"  - Space saved: {savings:.2f} MB ({(savings/original_size)*100:.1f}%)")
+print(f"  - Space saved: {savings:.2f} MB ({(savings / original_size) * 100:.1f}%)")

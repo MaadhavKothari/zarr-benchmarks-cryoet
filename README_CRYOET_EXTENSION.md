@@ -61,6 +61,13 @@ project with **comprehensive benchmarks on real cryo-electron tomography
    - Multi-format pipeline testing
    - Legacy data migration validation
 
+8. **✅ Webhook Server & Pipeline Integration** 🆕
+   - REST API for automated benchmark submission
+   - Asynchronous job processing with queue management
+   - Multi-modal support (10+ imaging modalities)
+   - Real-time status monitoring and result retrieval
+   - See [WEBHOOK_API_GUIDE.md](WEBHOOK_API_GUIDE.md) for details
+
 ---
 
 ## 📊 Quick Results Summary
@@ -239,6 +246,16 @@ zarr-benchmarks/
 - Confirms all metrics are Zarr-specific
 - Links to Zarr specifications
 - API documentation
+
+### For Pipeline Integration
+
+**Read:** `WEBHOOK_API_GUIDE.md`
+
+- REST API documentation
+- Webhook server setup
+- Python client examples
+- Multi-modal support
+- Production deployment
 
 ---
 

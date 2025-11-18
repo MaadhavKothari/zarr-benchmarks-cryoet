@@ -66,13 +66,13 @@ class DatasetBenchmarkRunner:
 
                     # Get compressor
                     if codec == "blosc_zstd":
-                        compressor = read_write_zarr.get_blosc_compressor("zstd", 5, "shuffle", 2)
+                        compressor = read_write_zarr.get_blosc_compressor("zstd", 5, "shuffle")
                     elif codec == "blosc_lz4":
-                        compressor = read_write_zarr.get_blosc_compressor("lz4", 5, "shuffle", 2)
+                        compressor = read_write_zarr.get_blosc_compressor("lz4", 5, "shuffle")
                     elif codec == "zstd":
-                        compressor = read_write_zarr.get_zstd_compressor(5, 2)
+                        compressor = read_write_zarr.get_zstd_compressor(5)
                     elif codec == "gzip":
-                        compressor = read_write_zarr.get_gzip_compressor(6, 2)
+                        compressor = read_write_zarr.get_gzip_compressor(6)
                     else:
                         compressor = None
 

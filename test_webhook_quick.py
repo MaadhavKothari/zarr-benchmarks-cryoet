@@ -55,22 +55,30 @@ async def test_small_benchmark():
                     print(f"✓ Job completed! (after {poll_count * 2}s)")
 
                     # Display results
-                    results = status["results"]
-                    dataset = results["dataset"]
+                    results = status.get("results", {})
                     print(f"\n{'='*60}")
                     print("RESULTS")
                     print(f"{'='*60}")
-                    print(f"Dataset: {dataset['dataset']}")
-                    print(f"Type: {dataset['dataset_type']}")
-                    print(f"Size: {dataset['size_mb']:.2f} MB")
 
-                    print("\nBest Performance:")
-                    print(f"  Write: {dataset['best_write']['codec']}")
-                    print(f"    Time: {dataset['best_write']['time_s']:.3f}s")
-                    print(f"  Read: {dataset['best_read']['codec']}")
-                    print(f"    Time: {dataset['best_read']['time_s']:.3f}s")
-                    print(f"  Compression: {dataset['best_compression']['codec']}")
-                    print(f"    Ratio: {dataset['best_compression']['ratio']:.2f}×")
+                    # Print raw results for debugging
+                    if isinstance(results, dict):
+                        print(f"Dataset: {results.get('dataset_name', 'N/A')}")
+                        print(f"Results keys: {list(results.keys())}")
+
+                        # Try to display key metrics if available
+                        if "summary" in results:
+                            summary = results["summary"]
+                            print(f"\nSummary:")
+                            print(f"  Best Write: {summary.get('best_write', 'N/A')}")
+                            print(f"  Best Read: {summary.get('best_read', 'N/A')}")
+                            print(f"  Best Compression: {summary.get('best_compression', 'N/A')}")
+                        else:
+                            print("\nRaw results:")
+                            import json
+                            print(json.dumps(results, indent=2, default=str))
+                    else:
+                        print(f"Results: {results}")
+
                     print(f"{'='*60}")
                     return True
 

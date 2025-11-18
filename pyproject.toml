@@ -38,6 +38,13 @@ Issues = "https://github.com/HEFTIEProject/zarr-benchmarks/issues"
 [tool.pytest.ini_options]
 addopts = "--strict-markers"
 markers = ["tensorstore", "zarr_python"]
+# Exclude CryoET connection tests from pytest collection (they have sys.exit() calls)
+norecursedirs = [".git", ".tox", "venv", "venv_*"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+# Explicitly exclude these standalone test scripts
+testpaths = ["tests"]
 
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F", "I"]

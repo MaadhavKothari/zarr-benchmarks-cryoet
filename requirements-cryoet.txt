@@ -21,10 +21,10 @@ cryoet_data_portal==4.5.0
 iohub>=0.2.2  # OME-Zarr, TIFF, NDTiff conversion
 
 # Jupyter Notebooks
-jupyterlab==4.4.10
-notebook==7.4.1
-ipykernel==6.30.0
-ipywidgets==8.1.6
+jupyterlab>=4.4.0
+notebook>=7.4.0
+ipykernel>=6.29.0
+ipywidgets>=8.1.0
 
 # 3D Visualization (optional)
 # napari[all]>=0.5.0  # Uncomment for interactive 3D viewing
